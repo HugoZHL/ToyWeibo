@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="The register page of ToyWeibo.">
+    <meta name="author" content="HugoZ">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <title>ToyWeibo 注册</title>
+
+    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" >
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ie10-viewport-bug-workaround.css') }}" >
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/signin.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jumbotron.css') }}">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="{{ url_for('static', filename='js/ie8-responsive-file-warning.js') }}"></script><![endif]-->
+    <script src="{{ url_for('static', filename='js/ie-emulation-modes-warning.js') }}"></script>
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+
+    <![endif]-->
+  </head>
+
+  <body>
+
+    <div class="container">
+
+        <div class="form row">
+            <form class="form-horizontal col-sm-offset-4 col-md-offset-4 col-lg-offset-4" id="register_form" method="post">
+                <h3 class="form-title">玩具微博 账号注册</h3><br/>
+                <div class="col-sm-6 col-md-6 col-lg-6">
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <i class="fa fa-user fa-lg"></i>
+                        <input class="form-control" type="email" placeholder="请输入邮箱" name="email" required autofocus="autofocus"/>
+                        <!-- <p>* 邮箱一经注册无法更改！</p> -->
+                    </div>
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <i class="fa fa-user fa-lg"></i>
+                        <input class="form-control" type="text" placeholder="请输入昵称" name="username" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <i class="fa fa-lock fa-lg"></i>
+                        <input class="form-control" type="password" placeholder="请输入密码" id="register_password" name="password" required/>
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <i class="fa fa-check fa-lg"></i>
+                        <input class="form-control" type="password" placeholder="请再次输入密码" name="rpassword" required/>
+                    </div>
+                    <!-- <div class="form-group">
+                        <label>Gender</label>
+                        <i class="fa fa-envelope fa-lg"></i>
+                        <select class="form-control" name="gender" required>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Birthday</label>
+                        <i class="fa fa-envelope fa-lg"></i>
+                        <input data-date-format="YYYY-MM-DD" class="form-control" type="date" name="birthday" required/>
+                    </div> -->
+                    <div class="form-group">
+                        <button class="btn btn-lg btn-primary btn-block" type="submit">注册！</button>
+                    </div>
+
+    {% if error != None %}
+    <p><font color="red">{{ error }}</font></p>
+    {% endif %}
+                </div>
+            </form>
+        </div>
+    </div> <!-- /container -->
+
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="{{ url_for('static', filename='js/ie10-viewport-bug-workaround.js') }}"></script>
+  </body>
+</html>
