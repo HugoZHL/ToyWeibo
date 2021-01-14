@@ -52,6 +52,7 @@ def get_posts_from_userid(userID):
     return posts
 
 
+# TODO: update informations for users
 def update_infos(request, userID):
     email = request.form['email']
     username = request.form['username']
@@ -60,3 +61,9 @@ def update_infos(request, userID):
     error = ''
     error = 'test'
     return error
+
+
+# TODO: searching
+def search_in_db(searching):
+    results = []
+    return results
