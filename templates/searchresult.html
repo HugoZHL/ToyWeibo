@@ -42,19 +42,19 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{{ url_for('show_all_sections') }}">玩具微博</a>
+          <a class="navbar-brand" href="{{ url_for('show_profile') }}">玩具微博 ToyWeibo</a>
         </div>
         <div class="navbar-collapse collapse">
           <div class="navbar-left">
             <a class="navbar-brand" href="{{ url_for('show_profile') }}"><p> 用户: {{ username }} </p></a>
-             <div class="navbar-brand">Normal-Search</div>
+             <div class="navbar-brand">搜索结果</div>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <form class="navbar-form navbar-right" method="post">
               <div class="form-group">
-                <input type="text" class="form-control" placeholder="Anything interesting?" name="searching" required>
+                <input type="text" class="form-control" placeholder="如何看待xxx？" name="searching" required>
               </div>
-              <button type="submit" class="btn btn-primary">Search</button>
+              <button type="submit" class="btn btn-primary">搜索</button>
             </form>
           </div><!--/.navbar-collapse -->
         </div>
