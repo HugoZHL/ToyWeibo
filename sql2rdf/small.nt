@@ -1,0 +1,84 @@
+@prefix u:   <http://example.org/user/> .
+@prefix w:   <http://example.org/weibo/> .
+@prefix ua:  <http://example.org/user_attr/> .
+@prefix wa:  <http://example.org/weibo_attr/> .
+@prefix r:   <http://example.org/rel/> .
+
+u:1 ua:screen_name "Jing_Mini_Shop" .
+u:1 ua:name "Jing_Mini_Shop" .
+u:1 ua:province 61 .
+u:1 ua:city 1 .
+u:1 ua:location "陕西 西安" .
+u:1 ua:url "http://wd.koudai.com/s/160206134?wfr=dx" .
+u:1 ua:gender "f" .
+u:1 ua:followersnum 3860 .
+u:1 ua:friendsnum 228 .
+u:1 ua:statusesnum 507 .
+u:1 ua:favouritesnum 0 .
+u:1 ua:created_at "2011-10-07 18:54:43" .
+u:1 ua:password "1" .
+u:1 ua:email "1" .
+u:2 ua:screen_name "百年润发One" .
+u:2 ua:name "百年润发One" .
+u:2 ua:province 42 .
+u:2 ua:city 8 .
+u:2 ua:location "湖北 荆门" .
+u:2 ua:url "" .
+u:2 ua:gender "m" .
+u:2 ua:followersnum 260 .
+u:2 ua:friendsnum 103 .
+u:2 ua:statusesnum 1326 .
+u:2 ua:favouritesnum 0 .
+u:2 ua:created_at "2012-08-06 14:44:20" .
+u:2 ua:password "2" .
+u:2 ua:email "2" .
+u:3 ua:screen_name "互联网的那点事" .
+u:3 ua:name "互联网的那点事" .
+u:3 ua:province 400 .
+u:3 ua:city 1000 .
+u:3 ua:location "海外" .
+u:3 ua:url "http://www.alibuybuy.com" .
+u:3 ua:gender "f" .
+u:3 ua:followersnum 1583942 .
+u:3 ua:friendsnum 989 .
+u:3 ua:statusesnum 30643 .
+u:3 ua:favouritesnum 331 .
+u:3 ua:created_at "2009-08-28 11:55:09" .
+u:3 ua:password "3" .
+u:3 ua:email "3" .
+u:1 r:follow u:2 .
+w:1 wa:date "2014-04-30 15:53:35" .
+w:1 wa:text "魅族MX3，配件齐全，充电头保护套贴膜支架剪卡器全赠送，代理拿货价¥1760，想当代理的评论留电话，Amy跟你聊聊天" .
+w:1 wa:source "<a href=\"http://app.weibo.com/t/feed/9ksdit\" rel=\"nofollow\">iPhone客户端</a>" .
+w:1 wa:repostsnum 0 .
+w:1 wa:commentsnum 0 .
+w:1 wa:attitudesnum 0 .
+w:1 wa:topic "魅族" .
+w:1 r:by u:1 .
+w:2 wa:date "2014-04-30 15:51:19" .
+w:2 wa:text "我只能这样说，凡是有欣赏能力和懂得区别美丑的人都会选择魅族，从产品的细节和精神上都能看出魅族的用心和诚意，对于我们这些懂手机且懂得欣赏的人，魅族在安卓手机里面没有对手，硬说对手OPPO倒是值得一提，其他则平庸。所以魅族敢于挑战自己。支持魅族！" .
+w:2 wa:source "<a href=\"http://app.weibo.com/t/feed/5dtGzh\" rel=\"nofollow\">MEIZU MX</a>" .
+w:2 wa:repostsnum 0 .
+w:2 wa:commentsnum 0 .
+w:2 wa:attitudesnum 0 .
+w:2 wa:topic "魅族" .
+w:2 r:by u:2 .
+w:3 wa:date "2014-04-29 21:40:26" .
+w:3 wa:text "我发起了一个投票【1799元的魅族MX3和1699元的小米3，你会买哪个？】凡是转发本微博，并投票的，到时间随机抽一位，送得票高的哪款手机！点击投票：http://t.cn/8smABBw" .
+w:3 wa:source "<a href=\"http://weibo.com/\" rel=\"nofollow\">微博 weibo.com</a>" .
+w:3 wa:repostsnum 10561 .
+w:3 wa:commentsnum 3559 .
+w:3 wa:attitudesnum 537 .
+w:3 wa:topic "魅族" .
+w:3 r:by u:1 .
+w:4 wa:date "2014-04-30 15:48:06" .
+w:4 wa:text "真心觉得米3不好看啊 支持魅族" .
+w:4 wa:source "<a href=\"http://weibo.com/\" rel=\"nofollow\">微博 weibo.com</a>" .
+w:4 wa:repostsnum 0 .
+w:4 wa:commentsnum 0 .
+w:4 wa:attitudesnum 0 .
+w:4 wa:topic "魅族" .
+w:4 r:by u:1 .
+w:1 r:comment w:2 .
+u:next r:is "4" .
+w:next r:is "5" .
