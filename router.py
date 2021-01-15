@@ -62,7 +62,9 @@ def edit_profile():
             if error:
                 return render_template("edit_profile.html", infos=infos, error=error)
             else:
-                return redirect('/profile/%s' % userID)
+                resp = make_response(redirect('/profile/%s' % userID))
+                resp.set_cookie('username', request.form['name'], max_age=3600)
+                return resp
         return render_template("edit_profile.html", infos=infos, error=error)
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -91,10 +93,11 @@ def show_following(userID=0):
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         else:
+            username = request.cookies["username"]
             if userID == 0: userID = int(request.cookies['userID'])
             infos = get_weibo_info_from_userid(userID)
             followings = get_following_from_userid(userID)
-            return render_template("followings.html", infos=infos, followings=followings)
+            return render_template("followings.html", username=username, infos=infos, followings=followings)
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -108,12 +111,13 @@ def show_follower(userID=0):
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         else:
+            username = request.cookies["username"]
             if userID == 0: userID = int(request.cookies['userID'])
             infos = get_weibo_info_from_userid(userID)
             followers = get_follower_from_userid(userID)
             print(infos)
             print(followers)
-            return render_template("followers.html", infos=infos, followers=followers)
+            return render_template("followers.html", username=username, infos=infos, followers=followers)
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')

@@ -5,11 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <meta name="description" content="The followings page in ToyWeibo.">
+    <meta name="description" content="The square page in ToyWeibo.">
     <meta name="author" content="HugoZ">
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
 
-    <title>玩具微博 关注列表</title>
+    <title>玩具微博 广场大厅</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" >
@@ -47,13 +47,13 @@
         <div class="navbar-collapse collapse">
           <div class="navbar-left">
             <a class="navbar-brand" href="{{ url_for('show_profile') }}"><p> 用户: {{ username }} </p></a>
-             <div class="navbar-brand">关注列表</div>
+             <div class="navbar-brand">广场大厅</div>
           </div>
           <div id="navbar" class="navbar-collapse collapse">
             <form class="navbar-form navbar-right" method="post">
               <a href="{{ url_for('edit_profile') }}" class="btn btn-warning">编辑个人信息</a>
               <div class="form-group">
-                <input type="text" class="form-control" placeholder="如何做到xxxx？" name="searching" required>
+                <input type="text" class="form-control" placeholder="xxx是一种怎样的体验？" name="searching" required>
               </div>
               <button type="submit" class="btn btn-primary">搜索</button>
             </form>
@@ -73,7 +73,7 @@
           <div class="panel-body" style="text-align:center">
             <h1>{{ infos['name'] }}</h1>
             <p style="color:darkgray; font-size: small">{{ infos["gender"] }}，来自{{ infos["location"] }}，于{{ infos["created_at"] }}加入玩具微博。</p>
-            <p style="font-size: large">微博：{{ infos["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ infos["followingsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ infos["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ infos["favouritesum"] }}</p>
+            <p style="font-size: large">微博：{{ infos["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ infos["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ infos["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ infos["favouritesum"] }}</p>
             <div class="row">
               <button class="btn btn-info">取消关注</button>
             </div>
@@ -81,18 +81,23 @@
         </div>
       </div>
 
-      {% for following in followings %}
+
+      {% for post in posts  %}
       <hr/>
       <div class="row">
-        <div class="col-md-9 col-lg-9" style="height: 100px">
-            <h4><strong>{{ following['name'] }}</strong></h4>
-            <p style="color:darkgray; font-size: small">{{ following["gender"] }}，来自{{ following["location"] }}，于{{ following["created_at"] }}加入玩具微博。</p>
-            <p style="font-size: large">微博：{{ following["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ following["followingsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ following["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ infos["favouritesum"] }}</p>
-        </div>
-        <div class="col-md-3 col-lg-3" style="text-align: center">
-            <br/>
-            <br/>
-            <button id="??"class="btn btn-info">取消关注</button>
+        <div class="col-md-12 col-lg-12">
+          <h4><strong>{{ post.username }}</strong></h4>
+          <br/>
+          <p style="font-size: 1.2em"><span style="color: blue">#{{ post.topic }}# </span>{{ post.text }}</p>
+          <div>
+            <p class="text-left">{{ post.time }}</p>
+            <div class="text-right">
+              <a class="btn text-right" style="color: darkred"><img src="{{ url_for('static', filename='images/icons/shanchu.png') }}" height="15" width="15"/> &nbsp;删除</a>
+              <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/dianzan.png') }}" height="15" width="15"/> &nbsp;赞 {{ post.attitudesum }}</a>
+              <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/pinglun.png') }}" height="15" width="15"/> &nbsp;评论 {{ post.commentsum }}</a>
+              <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/fenxiang.png') }}" height="15" width="15"/> &nbsp;转发 {{ post.repostsum }}</a>
+            </div>
+          </div>
         </div>
       </div>
       {% endfor %}
