@@ -92,10 +92,10 @@
         <div>
           <p class="text-left">{{ post.time }}</p>
           <div class="text-right">
-            <a class="btn text-right" style="color: darkred"> &nbsp;删除</a>
-            <a class="btn text-right"> &nbsp;赞{{ post.attitudesum }}</a>
-            <a class="btn text-right"> &nbsp;评论{{ post.commentsum }}</a>
-            <a class="btn text-right"> &nbsp;转发{{ post.repostsum }}</a>
+            <a class="btn text-right" style="color: darkred"><img src="{{ url_for('static', filename='images/icons/shanchu.png') }}" height="15" width="15"/> &nbsp;删除</a>
+            <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/dianzan.png') }}" height="15" width="15"/> &nbsp;赞{{ post.attitudesum }}</a>
+            <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/pinglun.png') }}" height="15" width="15"/> &nbsp;评论{{ post.commentsum }}</a>
+            <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/fenxiang.png') }}" height="15" width="15"/> &nbsp;转发{{ post.repostsum }}</a>
           </div>
         </div>
       </div>
