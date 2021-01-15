@@ -1,64 +1,86 @@
-# 插入、编辑操作都需要锁
+
+# -*- coding: utf-8 -*-
+from structs import *
 
 # TODO: finish register check and userID and error message
-def valid_register(request):
-    email = request.form['email']
-    username = request.form['username']
-    password = request.form['password']
-    rpassword = request.form['rpassword']
-    error = ''
+def valid_register(email, username, password, rpassword):
+    error = None
     userID = 0
     # other information?
     # checking...
     # 测试以下内容：邮箱是否已经注册（返回已经注册blabla）
-    # UserID从1开始，唯一
+    # userID就是uid，返回时用于保存在cookie，后续拿信息都用这个拿
     # 新用户插入到数据库
     error = 'test'
-    
     return userID, error
 
 # TODO: finish login check and return userID and error message
 def valid_login(email, password):
-    # 测试邮箱是否已注册、密码是否正确
+    # 测试邮箱是否已注册、密码是否正确，若有错误则error不为空
     userID = 0
     username = 'test'
-    error = ''
+    error = None
     return userID, username, error
 
 
 # TODO: return user information according to user id
 def get_weibo_info_from_userid(userID):
     infos = {
-        'username': 'test',
-        'num_weibo': 12,
-        'num_following': 11,
-        'num_followers': 10,
+        'name': '张三',
+        'location': '北京海淀',
+        'gender': '男',
+        'followersum': 123,
+        'friendsum': 1234,
+        'statusesum': 12345,
+        'favouritesum': 123456,
+        'created_at': '2020年1月2日',
     }
     return infos
 
 
 # TODO: return user information according to user id
-def get_id_info_from_userid(userID):
+def get_edit_info_from_userid(userID):
     infos = {
-        'username': 'test',
-        'email': 'test@test.com',
+        'name': '张三',
+        'email': '123@qq.com',
+        'province': '北京',
+        'city': '',
+        'location': '海淀',
+        'gender': '男',
     }
     return infos
 
 
 # TODO: return user posts accordingto user id
 def get_posts_from_userid(userID):
+    weibo1 = Weibo('test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
+    weibo2 = Weibo('test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
+        Reply('test4', 'bad', '2020年1月1日13:48', 8, 'test3'),
+        Reply('test5', 'not bad', '2020年1月1日13:49', 9, 'test5'),
+        ])
+    posts = [weibo1, weibo2]
+    return posts
+
+
+# TODO: return all visible posts from user id
+def get_all_posts_from_userid(userID):
     posts = []
     return posts
 
 
 # TODO: update informations for users
-def update_infos(request, userID):
-    email = request.form['email']
-    username = request.form['username']
-    password = request.form['password']
-    rpassword = request.form['rpassword']
-    error = ''
+def update_infos(userID, request):
+    print(
+        request.form['email'],
+        request.form['name'],
+        request.form['province'],
+        request.form['city'],
+        request.form['location'],
+        request.form['gender'],
+        request.form['password'],
+        request.form['rpassword']
+    )
+    error = None
     error = 'test'
     return error
 
@@ -67,3 +89,15 @@ def update_infos(request, userID):
 def search_in_db(searching):
     results = []
     return results
+
+
+# TODO: get following
+def get_following_from_userid(userID):
+    following = []
+    return following
+
+
+# TODO: get following
+def get_follower_from_userid(userID):
+    following = []
+    return following

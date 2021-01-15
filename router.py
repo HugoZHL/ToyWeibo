@@ -26,7 +26,7 @@ def login():
 def register():
     error = None
     if request.method == 'POST':
-        userID, error = valid_register(request)
+        userID, error = valid_register(request.form['email'], request.form['username'], request.form['password'], request.form['rpassword'])
         if not error:
             resp = make_response(redirect('/profile'))
             resp.set_cookie('username', request.form['username'], max_age=3600)
@@ -56,9 +56,9 @@ def edit_profile():
     error = None
     try:
         userID = request.cookies["userID"]
-        infos = get_id_info_from_userid(userID)
+        infos = get_edit_info_from_userid(userID)
         if request.method == 'POST':
-            error = update_infos(request, userID)
+            error = update_infos(userID, request)
             if error:
                 return render_template("edit_profile.html", infos=infos, error=error)
             else:
@@ -69,7 +69,7 @@ def edit_profile():
         return redirect('/')
 
 
-@app.route("/searchresult/")
+@app.route("/searchresult/", methods=['POST', 'GET'])
 @app.route("/searchresult/<string:searching>", methods=['POST', 'GET'])
 def result_page(searching=""):
     if not searching or request.method=='POST':
@@ -81,6 +81,101 @@ def result_page(searching=""):
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
+
+
+@app.route("/following", methods=['POST', 'GET'])
+@app.route("/following/<int:userID>", methods=['POST', 'GET'])
+def show_following():
+    try:
+        if request.method == 'POST':
+            searching = request.form['searching']
+            return redirect('/searchresult/%s' % searching)
+        else:
+            if userID == 0: userID = int(request.cookies['userID'])
+            infos = get_weibo_info_from_userid(userID)
+            following = get_following_from_userid(userID)
+            return render_template("following.html", infos=infos, following=following)
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
+
+
+@app.route("/follower", methods=['POST', 'GET'])
+def show_follower():
+    try:
+        if request.method == 'POST':
+            searching = request.form['searching']
+            return redirect('/searchresult/%s' % searching)
+        else:
+            if userID == 0: userID = int(request.cookies['userID'])
+            infos = get_weibo_info_from_userid(userID)
+            following = get_follower_from_userid(userID)
+            return render_template("following.html", infos=infos, following=following)
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
+
+
+@app.route('/square', methods=['POST', 'GET'])
+def square():
+    try:
+        if request.method == 'POST':
+            searching = request.form['searching']
+            return redirect('/searchresult/%s' % searching)
+        else:
+            userID = request.cookies['userID']
+            infos = get_weibo_info_from_userid(userID)
+            posts = get_all_posts_from_userid(userID)
+            return render_template("square.html", infos=infos, posts=posts)
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
+
+
+@app.route('/follow', methods=['POST'])
+def follow():
+    pass
+
+
+@app.route('/unfollow', methods=['POST'])
+def unfollow():
+    pass
+
+
+@app.route('/delete_post', methods=['POST'])
+def delete_post():
+    pass
+
+
+@app.route('/add_post', methods=['POST'])
+def add_post():
+    pass
+
+
+@app.route('/add_praise', methods=['POST'])
+def add_praise():
+    pass
+
+
+@app.route('/delete_praise', methods=['POST'])
+def delete_praise():
+    pass
+
+
+@app.route('/forward_post', methods=['POST'])
+def forward_post():
+    pass
+
+
+@app.route('/add_reply', methods=['POST'])
+def add_reply():
+    pass
+
+
+@app.route('/delete_reply', methods=['POST'])
+def delete_reply():
+    pass
+
 
 
 if __name__ == "__main__":
