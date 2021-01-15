@@ -93,11 +93,57 @@ def search_in_db(searching):
 
 # TODO: get following
 def get_following_from_userid(userID):
-    following = []
+    following = [
+        {
+            'name': 'test1',
+            'gender': '男',
+            'location': '湖北省武汉市江汉区',
+            'created_at': '2020年2月2日12:13',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+    ]
     return following
 
 
 # TODO: get following
 def get_follower_from_userid(userID):
-    following = []
-    return following
+    followers = [
+        {
+            'name': 'test1',
+            'gender': '男',
+            'location': '湖北省武汉市江汉区',
+            'created_at': '2020年2月2日12:13',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+    ]
+    return followers

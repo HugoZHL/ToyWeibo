@@ -85,7 +85,7 @@ def result_page(searching=""):
 
 @app.route("/following", methods=['POST', 'GET'])
 @app.route("/following/<int:userID>", methods=['POST', 'GET'])
-def show_following():
+def show_following(userID=0):
     try:
         if request.method == 'POST':
             searching = request.form['searching']
@@ -93,15 +93,16 @@ def show_following():
         else:
             if userID == 0: userID = int(request.cookies['userID'])
             infos = get_weibo_info_from_userid(userID)
-            following = get_following_from_userid(userID)
-            return render_template("following.html", infos=infos, following=following)
+            followings = get_following_from_userid(userID)
+            return render_template("followings.html", infos=infos, followings=followings)
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
 
 
 @app.route("/follower", methods=['POST', 'GET'])
-def show_follower():
+@app.route("/follower/<int:userID>", methods=['POST', 'GET'])
+def show_follower(userID=0):
     try:
         if request.method == 'POST':
             searching = request.form['searching']
@@ -109,8 +110,10 @@ def show_follower():
         else:
             if userID == 0: userID = int(request.cookies['userID'])
             infos = get_weibo_info_from_userid(userID)
-            following = get_follower_from_userid(userID)
-            return render_template("following.html", infos=infos, following=following)
+            followers = get_follower_from_userid(userID)
+            print(infos)
+            print(followers)
+            return render_template("followers.html", infos=infos, followers=followers)
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
