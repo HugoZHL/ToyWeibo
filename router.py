@@ -207,7 +207,8 @@ def unfollow():
 
 @app.route('/delete_post', methods=['POST'])
 def delete_post():
-    pass
+    print('delete post', request.form['postID'])
+    return redirect(request.form['path'])
 
 
 @app.route('/add_post', methods=['POST'])
@@ -219,12 +220,14 @@ def add_post():
 
 @app.route('/add_praise', methods=['POST'])
 def add_praise():
-    pass
+    print('add praise', request.form['postID'])
+    return redirect(request.form['path'])
 
 
 @app.route('/delete_praise', methods=['POST'])
 def delete_praise():
-    pass
+    print('delete praise', request.form['postID'])
+    return redirect(request.form['path'])
 
 
 @app.route('/forward_post', methods=['POST'])
