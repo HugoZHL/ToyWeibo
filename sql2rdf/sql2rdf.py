@@ -60,7 +60,7 @@ for l in f.readlines():
         pos3 = l.find(')')
         wid1 = l[pos1+2 : pos2-1]
         wid2 = l[pos2+3 : pos3-1]
-        o.writelines([ 'w:' + wid1 + ' r:comment w:' + wid2 + ' .\n' ])
+        o.writelines([ 'w:' + wid1 + ' r:repost w:' + wid2 + ' .\n' ])
 
 f.close()
 o.writelines([ 'u:next r:is \"' + str(maxuid+1) + '\" .\n' ])

@@ -79,6 +79,6 @@ w:4 wa:commentsnum 0 .
 w:4 wa:attitudesnum 0 .
 w:4 wa:topic "魅族" .
 w:4 r:by u:1 .
-w:1 r:comment w:2 .
+w:1 r:repost w:2 .
 u:next r:is "4" .
 w:next r:is "5" .
