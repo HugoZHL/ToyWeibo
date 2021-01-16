@@ -43,9 +43,12 @@ def show_profile(userID=0):
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         if userID == 0: userID = int(request.cookies['userID'])
+        myself = (userID == int(request.cookies['userID']))
+        follow = False
         infos = get_weibo_info_from_userid(userID)
         posts = get_posts_from_userid(userID)
-        return render_template("profile.html", username=request.cookies['username'], infos=infos, posts=posts, title='个人主页')
+        username = infos['name']
+        return render_template("profile.html", username=username, myself=myself, follow=follow, infos=infos, posts=posts, title='个人主页')
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -77,8 +80,10 @@ def result_page(searching=""):
     if not searching or request.method=='POST':
         searching = request.form['searching']
     try:
+        myUserID = int(request.cookies['userID'])
         username = request.cookies["username"]
         results = search_user_in_db(searching)
+        results = get_follow_status(myUserID, results)
         return render_template("searchresult.html", username=username, searching=searching, users=results, title='搜索结果')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -93,11 +98,16 @@ def show_following(userID=0):
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         else:
-            username = request.cookies["username"]
-            if userID == 0: userID = int(request.cookies['userID'])
+            myUserID = int(request.cookies['userID'])
+            if userID == 0:
+                userID = myUserID
+            myself = (userID == myUserID)
+            follow = False
             infos = get_weibo_info_from_userid(userID)
             followings = get_following_from_userid(userID)
-            return render_template("followings.html", username=username, infos=infos, users=followings, title='关注列表')
+            followings = get_follow_status(myUserID, followings)
+            username = infos['name']
+            return render_template("followings.html", username=username, myself=myself, follow=follow, infos=infos, users=followings, title='关注列表')
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -111,13 +121,16 @@ def show_follower(userID=0):
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         else:
-            username = request.cookies["username"]
-            if userID == 0: userID = int(request.cookies['userID'])
+            myUserID = int(request.cookies['userID'])
+            if userID == 0:
+                userID = myUserID
+            myself = (userID == myUserID)
+            follow = True
             infos = get_weibo_info_from_userid(userID)
             followers = get_follower_from_userid(userID)
-            print(infos)
-            print(followers)
-            return render_template("followers.html", username=username, infos=infos, users=followers, title='粉丝列表')
+            followers = get_follow_status(myUserID, followers)
+            username = infos['name']
+            return render_template("followers.html", username=username, myself=myself, follow=follow, infos=infos, users=followers, title='粉丝列表')
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -175,12 +188,16 @@ def adsearch():
 
 @app.route('/follow', methods=['POST'])
 def follow():
-    pass
+    follow_id = request.form['follow']
+    print('follow id:', follow_id)
+    return redirect(request.form['path'])
 
 
 @app.route('/unfollow', methods=['POST'])
 def unfollow():
-    pass
+    unfollow_id = request.form['unfollow']
+    print('unfollow id:', unfollow_id)
+    return redirect(request.form['path'])
 
 
 @app.route('/delete_post', methods=['POST'])

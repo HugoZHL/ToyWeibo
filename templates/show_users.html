@@ -9,7 +9,19 @@
   <div class="col-md-3 col-lg-3" style="text-align: center">
       <br/>
       <br/>
-      <button id="??"class="btn btn-info">取消关注</button>
+      {% if not user['ismyself'] %}
+        {% if user['following'] %}
+        <form method='post' action='/unfollow'>
+          <input type="hidden" name="path" value="{{ request.path }}"/>
+          <button type="submit" class="btn btn-secondary" style="height:40px;width:100px" name="unfollow" value="{{ user['userID'] }}">取消关注</button>
+        </form>
+        {% else %}
+        <form method='post' action='/follow'>
+          <input type="hidden" name="path" value="{{ request.path }}"/>
+          <button type="submit" class="btn btn-info" style="height:40px;width:100px" name="follow" value="{{ user['userID'] }}">关注</button>
+        </form>
+        {% endif %}
+      {% endif %}
   </div>
 </div>
 {% endfor %}

@@ -28,6 +28,7 @@ def valid_login(email, password):
 # TODO: return user information according to user id
 def get_weibo_info_from_userid(userID):
     infos = {
+        'userID': userID,
         'name': '张三',
         'location': '北京海淀',
         'gender': '男',
@@ -107,6 +108,7 @@ def update_infos(userID, request):
 def search_user_in_db(searching):
     results = [
         {
+            'userID': 1,
             'name': 'test1',
             'gender': '男',
             'location': '湖北省武汉市江汉区',
@@ -115,9 +117,9 @@ def search_user_in_db(searching):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
+            'userID': 2,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -126,7 +128,6 @@ def search_user_in_db(searching):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
     ]
     return results
@@ -136,6 +137,7 @@ def search_user_in_db(searching):
 def get_following_from_userid(userID):
     following = [
         {
+            'userID': 0,
             'name': 'test1',
             'gender': '男',
             'location': '湖北省武汉市江汉区',
@@ -144,9 +146,9 @@ def get_following_from_userid(userID):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
+            'userID': 2,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -155,7 +157,6 @@ def get_following_from_userid(userID):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
     ]
     return following
@@ -165,6 +166,7 @@ def get_following_from_userid(userID):
 def get_follower_from_userid(userID):
     followers = [
         {
+            'userID': 1,
             'name': 'test1',
             'gender': '男',
             'location': '湖北省武汉市江汉区',
@@ -173,9 +175,9 @@ def get_follower_from_userid(userID):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
+            'userID': 2,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -184,7 +186,6 @@ def get_follower_from_userid(userID):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
     ]
     return followers
@@ -217,7 +218,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
             'name': 'test2',
@@ -228,7 +228,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },)
         ],
         3: [
@@ -241,7 +240,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
             'name': 'test2',
@@ -252,7 +250,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
             'name': 'test2',
@@ -263,7 +260,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         })
         ],
         4: [
@@ -276,7 +272,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
             'name': 'test2',
@@ -287,7 +282,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },{
             'name': 'test2',
             'gender': '女',
@@ -297,7 +291,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },{
             'name': 'test2',
             'gender': '女',
@@ -307,7 +300,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         })
         ],
         5: [
@@ -320,7 +312,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },
         {
             'name': 'test2',
@@ -331,7 +322,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },{
             'name': 'test2',
             'gender': '女',
@@ -341,7 +331,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },{
             'name': 'test2',
             'gender': '女',
@@ -351,7 +340,6 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         },{
             'name': 'test2',
             'gender': '女',
@@ -361,8 +349,15 @@ def get_adsearch_result(userID, request):
             'friendsum': 1234,
             'statusesum': 12345,
             'favouritesum': 123456,
-            'inverse': False,
         })
         ],
     }
     return infos, error
+
+
+def get_follow_status(userID, otherUsers):
+    for i in range(len(otherUsers)):
+        otherUsers[i]['following'] = (i % 2 == 0)
+        otherUsers[i]['ismyself'] = (userID == otherUsers[i]['userID'])
+    print(otherUsers)
+    return otherUsers

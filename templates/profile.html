@@ -32,7 +32,11 @@
   </head>
 
   <body>
+    {% if myself %}
     {% include "nav_personal.html" %}
+    {% else %}
+    {% include "nav_general.html" %}
+    {% endif %}
 
     <div id="authorized" d="{{ authorized }}" style="display:none"></div>
 
