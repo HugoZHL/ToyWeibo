@@ -75,6 +75,17 @@ def get_all_posts_from_userid(userID):
     return posts
 
 
+# TODO: get all hot posts
+def get_all_host_posts(userID):
+    weibo1 = Weibo('test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
+    weibo2 = Weibo('test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
+        Reply('test4', 'bad', '2020年1月1日13:48', 8, 'test3'),
+        Reply('test5', 'not bad', '2020年1月1日13:49', 9, 'test5'),
+        ])
+    posts = [weibo1, weibo2]
+    return posts
+
+
 # TODO: update informations for users
 def update_infos(userID, request):
     print(
@@ -93,8 +104,31 @@ def update_infos(userID, request):
 
 
 # TODO: searching
-def search_in_db(searching):
-    results = []
+def search_user_in_db(searching):
+    results = [
+        {
+            'name': 'test1',
+            'gender': '男',
+            'location': '湖北省武汉市江汉区',
+            'created_at': '2020年2月2日12:13',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+    ]
     return results
 
 
