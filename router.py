@@ -232,7 +232,9 @@ def delete_praise():
 
 @app.route('/forward_post', methods=['POST'])
 def forward_post():
-    pass
+    print('forward post', request.form['postid'])
+    print('new text', request.form['forward_text'])
+    return redirect(request.form['path'])
 
 
 @app.route('/add_reply', methods=['POST'])
