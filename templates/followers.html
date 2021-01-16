@@ -40,34 +40,9 @@
     <div class="container" style="margin-top:1vw">
       <div id="dataid" d="{{ infos['name'] }}" style="display:none"></div>
 
-      <div class="p-2" style="width: 100%;">
-        <div class="container">
-          <div class="panel-body" style="text-align:center">
-            <h1>{{ infos['name'] }}</h1>
-            <p style="color:darkgray; font-size: small">{{ infos["gender"] }}，来自{{ infos["location"] }}，于{{ infos["created_at"] }}加入玩具微博。</p>
-            <p style="font-size: large">微博：{{ infos["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ infos["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ infos["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ infos["favouritesum"] }}</p>
-            <div class="row">
-              <button class="btn btn-info">取消关注</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      {% include "show_infos.html" %}
 
-      {% for follower in followers %}
-      <hr/>
-      <div class="row">
-        <div class="col-md-9 col-lg-9" style="height: 100px">
-            <h4><strong>{{ follower['name'] }}</strong></h4>
-            <p style="color:darkgray; font-size: small">{{ follower["gender"] }}，来自{{ follower["location"] }}，于{{ follower["created_at"] }}加入玩具微博。</p>
-            <p style="font-size: large">微博：{{ follower["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ follower["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ follower["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ infos["favouritesum"] }}</p>
-        </div>
-        <div class="col-md-3 col-lg-3" style="text-align: center">
-            <br/>
-            <br/>
-            <button id="??"class="btn btn-info">取消关注</button>
-        </div>
-      </div>
-      {% endfor %}
+      {% include "show_users.html" %}
     
       <hr>
       <footer>

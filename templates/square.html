@@ -56,26 +56,7 @@
         </div>
       </div>
 
-
-      {% for post in posts  %}
-      <hr/>
-      <div class="row">
-        <div class="col-md-12 col-lg-12">
-          <h4><strong>{{ post.username }}</strong></h4>
-          <br/>
-          <p style="font-size: 1.2em"><span style="color: blue">#{{ post.topic }}# </span>{{ post.text }}</p>
-          <div>
-            <p class="text-left">{{ post.time }}</p>
-            <div class="text-right">
-              <a class="btn text-right" style="color: darkred"><img src="{{ url_for('static', filename='images/icons/shanchu.png') }}" height="15" width="15"/> &nbsp;删除</a>
-              <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/dianzan.png') }}" height="15" width="15"/> &nbsp;赞 {{ post.attitudesum }}</a>
-              <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/pinglun.png') }}" height="15" width="15"/> &nbsp;评论 {{ post.commentsum }}</a>
-              <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/fenxiang.png') }}" height="15" width="15"/> &nbsp;转发 {{ post.repostsum }}</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
+      {% include "show_posts.html" %}
     
       <hr>
       <footer>

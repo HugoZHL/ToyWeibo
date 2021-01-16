@@ -97,7 +97,7 @@ def show_following(userID=0):
             if userID == 0: userID = int(request.cookies['userID'])
             infos = get_weibo_info_from_userid(userID)
             followings = get_following_from_userid(userID)
-            return render_template("followings.html", username=username, infos=infos, followings=followings, title='关注列表', ph_search=random_ph_search())
+            return render_template("followings.html", username=username, infos=infos, users=followings, title='关注列表', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -117,7 +117,7 @@ def show_follower(userID=0):
             followers = get_follower_from_userid(userID)
             print(infos)
             print(followers)
-            return render_template("followers.html", username=username, infos=infos, followers=followers, title='粉丝列表', ph_search=random_ph_search())
+            return render_template("followers.html", username=username, infos=infos, users=followers, title='粉丝列表', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
