@@ -199,3 +199,170 @@ def random_ph_search():
     ]
     ind = random.randint(0, 3)
     return cands[ind]
+
+
+# TODO: adsearch result
+def get_adsearch_result(userID, request):
+    email1 = request.form['email1']
+    email2 = request.form['email2']
+    error = None
+    infos = {
+        2: [
+            ({
+            'name': 'test1',
+            'gender': '男',
+            'location': '湖北省武汉市江汉区',
+            'created_at': '2020年2月2日12:13',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },)
+        ],
+        3: [
+            ({
+            'name': 'test1',
+            'gender': '男',
+            'location': '湖北省武汉市江汉区',
+            'created_at': '2020年2月2日12:13',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        })
+        ],
+        4: [
+            ({
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },{
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },{
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        })
+        ],
+        5: [
+            ({
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },
+        {
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },{
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },{
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        },{
+            'name': 'test2',
+            'gender': '女',
+            'location': '湖北省武汉市汉阳区',
+            'created_at': '2020年2月2日12:12',
+            'followersum': 123,
+            'friendsum': 1234,
+            'statusesum': 12345,
+            'favouritesum': 123456,
+            'inverse': False,
+        })
+        ],
+    }
+    return infos, error

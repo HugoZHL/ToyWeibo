@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<!-- saved from url=(0042)https://v3.bootcss.com/examples/jumbotron/ -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+    <meta name="description" content="The advanced search result page in ToyWeibo.">
+    <meta name="author" content="HugoZ">
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
+    <title>玩具微博 高级搜索结果</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}" >
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ie10-viewport-bug-workaround.css') }}" >
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/jumbotron.css') }}">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    {% include "nav_general.html" %}
+
+    <div id="authorized" d="{{ authorized }}" style="display:none"></div>
+
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="container" style="margin-top:1vw">
+      <div id="dataid" d="{{ infos['name'] }}" style="display:none"></div>
+      {% if 2 in infos %}
+      <h3>直接关注关系</h3>
+      {% for cand in infos[2] %}
+      <div class="row">
+        <div class="col-md-6 col-lg-6" style="height: 100px; border-right: lightgray 1px solid; border-left: lightgray 1px solid">
+            <h4><strong>{{ cand[0]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[0]["gender"] }}，来自{{ cand[0]["location"] }}，于{{ cand[0]["created_at"] }}加入玩具微博。</p>
+            <p style="font-size: small">微博：{{ cand[0]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[0]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ cand[0]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[0]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-6 col-lg-6" style="height: 100px; border-right: lightgray 1px solid">
+            <h4><strong>{{ cand[1]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[1]["gender"] }}，来自{{ cand[1]["location"] }}，于{{ cand[1]["created_at"] }}加入玩具微博。</p>
+            <p style="font-size: small">微博：{{ cand[1]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[1]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ cand[1]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[1]["favouritesum"] }}</p>
+        </div>
+      </div>
+      <hr/>
+      {% endfor %}
+      {% endif %}
+
+      {% if 3 in infos %}
+      <h3>间接关注关系</h3>
+      {% for cand in infos[3] %}
+      <div class="row">
+        <div class="col-md-4 col-lg-4" style="height: 140px; border-right: lightgray 1px solid; border-left: lightgray 1px solid">
+            <h4><strong>{{ cand[0]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[0]["gender"] }}，<br/>来自{{ cand[0]["location"] }}，<br/>于{{ cand[0]["created_at"] }}加入玩具微博。</p>
+            <p style="font-size: small">微博：{{ cand[0]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[0]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ cand[0]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[0]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-4 col-lg-4" style="height: 140px; border-right: lightgray 1px solid">
+            <h4><strong>{{ cand[1]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[1]["gender"] }}，<br/>来自{{ cand[1]["location"] }}，<br/>于{{ cand[1]["created_at"] }}加入玩具微博。</p>
+            <p style="font-size: small">微博：{{ cand[1]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[1]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ cand[1]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[1]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-4 col-lg-4" style="height: 140px; border-right: lightgray 1px solid">
+          <h4><strong>{{ cand[2]['name'] }}</strong></h4>
+          <p style="color:darkgray; font-size: small">{{ cand[2]["gender"] }}，<br/>来自{{ cand[2]["location"] }}，<br/>于{{ cand[2]["created_at"] }}加入玩具微博。</p>
+          <p style="font-size: small">微博：{{ cand[2]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[2]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ cand[2]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[2]["favouritesum"] }}</p>
+      </div>
+      </div>
+      {% endfor %}
+      <hr/>
+      {% endif %}
+
+      {% if 4 in infos %}
+      <h3>间隔关注关系</h3>
+      {% for cand in infos[4] %}
+      <div class="row">
+        <div class="col-md-3 col-lg-3" style="height: 160px; border-right: lightgray 1px solid; border-left: lightgray 1px solid">
+            <h4><strong>{{ cand[0]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[0]["gender"] }}，<br/>来自{{ cand[0]["location"] }}，<br/>于{{ cand[0]["created_at"] }}加入玩具微博。</p>
+            <p style="font-size: small">微博：{{ cand[0]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[0]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[0]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[0]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-3 col-lg-3" style="height: 160px; border-right: lightgray 1px solid">
+            <h4><strong>{{ cand[1]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[1]["gender"] }}，<br/>来自{{ cand[1]["location"] }}，<br/>于{{ cand[1]["created_at"] }}加入玩具微博。</p>
+            <p style="font-size: small">微博：{{ cand[1]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[1]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[1]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[1]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-3 col-lg-3" style="height: 160px; border-right: lightgray 1px solid">
+          <h4><strong>{{ cand[2]['name'] }}</strong></h4>
+          <p style="color:darkgray; font-size: small">{{ cand[2]["gender"] }}，<br/>来自{{ cand[2]["location"] }}，<br/>于{{ cand[2]["created_at"] }}加入玩具微博。</p>
+          <p style="font-size: small">微博：{{ cand[2]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[2]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[2]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[2]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-3 col-lg-3" style="height: 160px; border-right: lightgray 1px solid">
+          <h4><strong>{{ cand[3]['name'] }}</strong></h4>
+          <p style="color:darkgray; font-size: small">{{ cand[3]["gender"] }}，<br/>来自{{ cand[3]["location"] }}，<br/>于{{ cand[3]["created_at"] }}加入玩具微博。</p>
+          <p style="font-size: small">微博：{{ cand[3]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ cand[3]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[3]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ cand[3]["favouritesum"] }}</p>
+        </div>
+      </div>
+      {% endfor %}
+      <hr/>
+      {% endif %}
+
+      {% if 5 in infos %}
+      <h3>远房关注关系</h3>
+      {% for cand in infos[5] %}
+      <div class="row">
+        <div class="col-md-3 col-lg-3" style="height: 200px; border-right: lightgray 1px solid; border-left: lightgray 1px solid">
+            <h4><strong>{{ cand[0]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[0]["gender"] }}，<br/>来自{{ cand[0]["location"] }}，<br/>{{ cand[0]["created_at"] }}加入。</p>
+            <p style="font-size: small">微博：{{ cand[0]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>粉丝：{{ cand[0]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[0]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>点赞：{{ cand[0]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-2 col-lg-2" style="height: 200px; border-right: lightgray 1px solid">
+            <h4><strong>{{ cand[1]['name'] }}</strong></h4>
+            <p style="color:darkgray; font-size: small">{{ cand[1]["gender"] }}，<br/>来自{{ cand[1]["location"] }}，<br/>{{ cand[1]["created_at"] }}加入。</p>
+            <p style="font-size: small">微博：{{ cand[1]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>粉丝：{{ cand[1]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[1]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>点赞：{{ cand[1]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-2 col-lg-2" style="height: 200px; border-right: lightgray 1px solid">
+          <h4><strong>{{ cand[2]['name'] }}</strong></h4>
+          <p style="color:darkgray; font-size: small">{{ cand[2]["gender"] }}，<br/>来自{{ cand[2]["location"] }}，<br/>{{ cand[2]["created_at"] }}加入。</p>
+          <p style="font-size: small">微博：{{ cand[2]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>粉丝：{{ cand[2]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[2]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>点赞：{{ cand[2]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-2 col-lg-2" style="height: 200px; border-right: lightgray 1px solid">
+          <h4><strong>{{ cand[3]['name'] }}</strong></h4>
+          <p style="color:darkgray; font-size: small">{{ cand[3]["gender"] }}，<br/>来自{{ cand[3]["location"] }}，<br/>{{ cand[3]["created_at"] }}加入。</p>
+          <p style="font-size: small">微博：{{ cand[3]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>粉丝：{{ cand[3]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[3]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>点赞：{{ cand[3]["favouritesum"] }}</p>
+        </div>
+        <div class="col-md-3 col-lg-3" style="height: 200px; border-right: lightgray 1px solid">
+          <h4><strong>{{ cand[3]['name'] }}</strong></h4>
+          <p style="color:darkgray; font-size: small">{{ cand[3]["gender"] }}，<br/>来自{{ cand[3]["location"] }}，<br/>{{ cand[3]["created_at"] }}加入。</p>
+          <p style="font-size: small">微博：{{ cand[3]["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>粉丝：{{ cand[3]["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>关注：{{ cand[3]["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;<br/>点赞：{{ cand[3]["favouritesum"] }}</p>
+        </div>
+      </div>
+      {% endfor %}
+      <hr/>
+      {% endif %}
+      
+      {% if infos == {} %}
+      <h3>用户间无联系！</h3>
+      <hr/>
+      {% endif %}
+      
+      <footer>
+        <p>Copyright © Credit to: HugoZ, huangsy, AUV🥝.</p>
+      </footer> 
+    </div>
+  </body>
+</html>

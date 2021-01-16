@@ -155,6 +155,24 @@ def recommends():
         return redirect('/')
 
 
+@app.route('/adsearch', methods=['GET', 'POST'])
+def adsearch():
+    error = None
+    try:
+        userID = request.cookies["userID"]
+        username = request.cookies["username"]
+        if request.method == 'POST':
+            infos, error = get_adsearch_result(userID, request)
+            if error:
+                return render_template("adsearch.html", error=error)
+            else:
+                return render_template("adsearchresult.html", username=username, infos=infos)
+        return render_template("adsearch.html", error=error)
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
+
+
 @app.route('/follow', methods=['POST'])
 def follow():
     pass
