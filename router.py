@@ -16,7 +16,7 @@ def login():
     if request.method == 'POST':
         userID, username, error = valid_login(request.form['email'], request.form['password'])
         if not error:
-            resp = make_response(redirect('/profile'))
+            resp = make_response(redirect('/square'))
             resp.set_cookie('username', username, max_age=3600)
             resp.set_cookie('userID', str(userID), max_age=3600)
             return resp
@@ -28,7 +28,7 @@ def register():
     if request.method == 'POST':
         userID, error = valid_register(request.form['email'], request.form['username'], request.form['password'], request.form['rpassword'])
         if not error:
-            resp = make_response(redirect('/profile'))
+            resp = make_response(redirect('/square'))
             resp.set_cookie('username', request.form['username'], max_age=3600)
             resp.set_cookie('userID', str(userID), max_age=3600)
             return resp
@@ -131,9 +131,9 @@ def square():
             return redirect('/searchresult/%s' % searching)
         else:
             userID = request.cookies['userID']
-            infos = get_weibo_info_from_userid(userID)
+            username = request.cookies["username"]
             posts = get_all_posts_from_userid(userID)
-            return render_template("square.html", infos=infos, posts=posts)
+            return render_template("square.html", username=username, posts=posts)
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')

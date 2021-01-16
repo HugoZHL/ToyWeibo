@@ -64,7 +64,12 @@ def get_posts_from_userid(userID):
 
 # TODO: return all visible posts from user id
 def get_all_posts_from_userid(userID):
-    posts = []
+    weibo1 = Weibo('test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
+    weibo2 = Weibo('test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
+        Reply('test4', 'bad', '2020年1月1日13:48', 8, 'test3'),
+        Reply('test5', 'not bad', '2020年1月1日13:49', 9, 'test5'),
+        ])
+    posts = [weibo1, weibo2]
     return posts
 
 
