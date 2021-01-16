@@ -7,7 +7,6 @@
         <a href="{{ url_for('show_profile', userID=infos['userID']) }}" style='color: black'>微博：{{ infos["statusesum"] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="{{ url_for('show_follower', userID=infos['userID']) }}" style='color: black'>粉丝：{{ infos["followersum"] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="{{ url_for('show_following', userID=infos['userID']) }}" style='color: black'>关注：{{ infos["friendsum"] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-        点赞：{{ infos["favouritesum"] }}
       </p>
       {% if not myself %}
       <div class="row">
