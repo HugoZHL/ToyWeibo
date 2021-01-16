@@ -47,7 +47,8 @@ def show_profile(userID=0):
         follow = False
         infos = get_weibo_info_from_userid(userID)
         posts = get_posts_from_userid(userID)
-        username = infos['name']
+        posts = get_praise_infos(userID, posts)
+        username = request.cookies['username']
         return render_template("profile.html", username=username, myself=myself, follow=follow, infos=infos, posts=posts, title='个人主页')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -58,7 +59,7 @@ def show_profile(userID=0):
 def edit_profile():
     error = None
     try:
-        userID = request.cookies["userID"]
+        userID = int(request.cookies["userID"])
         infos = get_edit_info_from_userid(userID)
         if request.method == 'POST':
             error = update_infos(userID, request)
@@ -106,7 +107,7 @@ def show_following(userID=0):
             infos = get_weibo_info_from_userid(userID)
             followings = get_following_from_userid(userID)
             followings = get_follow_status(myUserID, followings)
-            username = infos['name']
+            username = request.cookies['username']
             return render_template("followings.html", username=username, myself=myself, follow=follow, infos=infos, users=followings, title='关注列表')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -129,7 +130,7 @@ def show_follower(userID=0):
             infos = get_weibo_info_from_userid(userID)
             followers = get_follower_from_userid(userID)
             followers = get_follow_status(myUserID, followers)
-            username = infos['name']
+            username = request.cookies['username']
             return render_template("followers.html", username=username, myself=myself, follow=follow, infos=infos, users=followers, title='粉丝列表')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -143,9 +144,11 @@ def square():
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         else:
-            userID = request.cookies['userID']
+            userID = int(request.cookies['userID'])
             username = request.cookies["username"]
             posts = get_all_posts_from_userid(userID)
+            posts = get_praise_infos(userID, posts)
+            print(posts)
             return render_template("square.html", username=username, posts=posts, title='广场大厅')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -159,9 +162,11 @@ def recommends():
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
         else:
-            userID = request.cookies['userID']
+            userID = int(request.cookies['userID'])
             username = request.cookies["username"]
             posts = get_all_host_posts(userID)
+            posts = get_praise_infos(userID, posts)
+            print(posts)
             return render_template("recommends.html", username=username, posts=posts, title='热点推荐')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -172,14 +177,14 @@ def recommends():
 def adsearch():
     error = None
     try:
-        userID = request.cookies["userID"]
+        userID = int(request.cookies["userID"])
         username = request.cookies["username"]
         if request.method == 'POST':
             infos, error = get_adsearch_result(userID, request)
             if error:
                 return render_template("adsearch.html", error=error)
             else:
-                return render_template("adsearchresult.html", username=username, infos=infos)
+                return render_template("adsearchresult.html", title='高级搜索结果', username=username, infos=infos)
         return render_template("adsearch.html", error=error)
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -207,7 +212,9 @@ def delete_post():
 
 @app.route('/add_post', methods=['POST'])
 def add_post():
-    pass
+    text = request.form['content']
+    print('Add post: ', text)
+    return redirect(request.form['path'])
 
 
 @app.route('/add_praise', methods=['POST'])

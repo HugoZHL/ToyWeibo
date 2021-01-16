@@ -56,8 +56,8 @@ def get_edit_info_from_userid(userID):
 
 # TODO: return user posts accordingto user id
 def get_posts_from_userid(userID):
-    weibo1 = Weibo('test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
-    weibo2 = Weibo('test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
+    weibo1 = Weibo(0, 'test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
+    weibo2 = Weibo(2, 'test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
         Reply('test4', 'bad', '2020年1月1日13:48', 8, 'test3'),
         Reply('test5', 'not bad', '2020年1月1日13:49', 9, 'test5'),
         ])
@@ -67,8 +67,8 @@ def get_posts_from_userid(userID):
 
 # TODO: return all visible posts from user id
 def get_all_posts_from_userid(userID):
-    weibo1 = Weibo('test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
-    weibo2 = Weibo('test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
+    weibo1 = Weibo(1, 'test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
+    weibo2 = Weibo(2, 'test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
         Reply('test4', 'bad', '2020年1月1日13:48', 8, 'test3'),
         Reply('test5', 'not bad', '2020年1月1日13:49', 9, 'test5'),
         ])
@@ -78,8 +78,8 @@ def get_all_posts_from_userid(userID):
 
 # TODO: get all hot posts
 def get_all_host_posts(userID):
-    weibo1 = Weibo('test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
-    weibo2 = Weibo('test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
+    weibo1 = Weibo(1, 'test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [Reply('test2', 'good', '2020年1月1日13:46', 4, 'test1')])
+    weibo2 = Weibo(2, 'test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '天气', [
         Reply('test4', 'bad', '2020年1月1日13:48', 8, 'test3'),
         Reply('test5', 'not bad', '2020年1月1日13:49', 9, 'test5'),
         ])
@@ -210,6 +210,7 @@ def get_adsearch_result(userID, request):
     infos = {
         2: [
             ({
+            'userID': 1,
             'name': 'test1',
             'gender': '男',
             'location': '湖北省武汉市江汉区',
@@ -220,6 +221,7 @@ def get_adsearch_result(userID, request):
             'favouritesum': 123456,
         },
         {
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -232,6 +234,7 @@ def get_adsearch_result(userID, request):
         ],
         3: [
             ({
+            'userID': 1,
             'name': 'test1',
             'gender': '男',
             'location': '湖北省武汉市江汉区',
@@ -242,6 +245,7 @@ def get_adsearch_result(userID, request):
             'favouritesum': 123456,
         },
         {
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -252,6 +256,7 @@ def get_adsearch_result(userID, request):
             'favouritesum': 123456,
         },
         {
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -264,6 +269,7 @@ def get_adsearch_result(userID, request):
         ],
         4: [
             ({
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -274,6 +280,7 @@ def get_adsearch_result(userID, request):
             'favouritesum': 123456,
         },
         {
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -283,6 +290,7 @@ def get_adsearch_result(userID, request):
             'statusesum': 12345,
             'favouritesum': 123456,
         },{
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -292,6 +300,7 @@ def get_adsearch_result(userID, request):
             'statusesum': 12345,
             'favouritesum': 123456,
         },{
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -304,6 +313,7 @@ def get_adsearch_result(userID, request):
         ],
         5: [
             ({
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -314,6 +324,7 @@ def get_adsearch_result(userID, request):
             'favouritesum': 123456,
         },
         {
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -323,6 +334,7 @@ def get_adsearch_result(userID, request):
             'statusesum': 12345,
             'favouritesum': 123456,
         },{
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -332,6 +344,7 @@ def get_adsearch_result(userID, request):
             'statusesum': 12345,
             'favouritesum': 123456,
         },{
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -341,6 +354,7 @@ def get_adsearch_result(userID, request):
             'statusesum': 12345,
             'favouritesum': 123456,
         },{
+            'userID': 1,
             'name': 'test2',
             'gender': '女',
             'location': '湖北省武汉市汉阳区',
@@ -361,3 +375,10 @@ def get_follow_status(userID, otherUsers):
         otherUsers[i]['ismyself'] = (userID == otherUsers[i]['userID'])
     print(otherUsers)
     return otherUsers
+
+
+def get_praise_infos(userID, posts):
+    for i in range(len(posts)):
+        posts[i].myself = (userID == posts[i].userID)
+        posts[i].praised = i % 2 == 0
+    return posts

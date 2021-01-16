@@ -2,6 +2,7 @@
 
 class Weibo(object):
     __slots__ = [
+        'userID',
         'username',
         'text',
         'time',
@@ -10,8 +11,11 @@ class Weibo(object):
         'attitudesum',
         'topic',
         'replies',
+        'myself',
+        'praised',
     ]
-    def __init__(self, username, text, time, repostsum, commentsum, attitudesum, topic, replies):
+    def __init__(self, userID, username, text, time, repostsum, commentsum, attitudesum, topic, replies):
+        self.userID = userID
         self.username = username
         self.text = text
         self.time = time
