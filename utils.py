@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 from structs import *
 
+import random
+
 # TODO: finish register check and userID and error message
 def valid_register(email, username, password, rpassword):
     error = None
@@ -152,3 +154,14 @@ def get_follower_from_userid(userID):
         },
     ]
     return followers
+
+
+def random_ph_search():
+    cands = [
+        '如何看待xxx？',
+        '#今日热搜#',
+        '如何做到xxx？',
+        'xxx是一种怎样的体验？',
+    ]
+    ind = random.randint(0, 3)
+    return cands[ind]

@@ -45,7 +45,7 @@ def show_profile(userID=0):
         if userID == 0: userID = int(request.cookies['userID'])
         infos = get_weibo_info_from_userid(userID)
         posts = get_posts_from_userid(userID)
-        return render_template("profile.html", username=request.cookies['username'], infos=infos, posts=posts)
+        return render_template("profile.html", username=request.cookies['username'], infos=infos, posts=posts, title='个人主页', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -79,7 +79,7 @@ def result_page(searching=""):
     try:
         username = request.cookies["username"]
         result = search_in_db(searching)
-        return render_template("searchresult.html", username=username, searching=searching, result=result)
+        return render_template("searchresult.html", username=username, searching=searching, result=result, title='搜索结果', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -97,7 +97,7 @@ def show_following(userID=0):
             if userID == 0: userID = int(request.cookies['userID'])
             infos = get_weibo_info_from_userid(userID)
             followings = get_following_from_userid(userID)
-            return render_template("followings.html", username=username, infos=infos, followings=followings)
+            return render_template("followings.html", username=username, infos=infos, followings=followings, title='关注列表', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -117,7 +117,7 @@ def show_follower(userID=0):
             followers = get_follower_from_userid(userID)
             print(infos)
             print(followers)
-            return render_template("followers.html", username=username, infos=infos, followers=followers)
+            return render_template("followers.html", username=username, infos=infos, followers=followers, title='粉丝列表', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
@@ -133,7 +133,7 @@ def square():
             userID = request.cookies['userID']
             username = request.cookies["username"]
             posts = get_all_posts_from_userid(userID)
-            return render_template("square.html", username=username, posts=posts)
+            return render_template("square.html", username=username, posts=posts, title='广场大厅', ph_search=random_ph_search())
     except KeyError:
         print(KeyError, " keyerror for username")
         return redirect('/')
