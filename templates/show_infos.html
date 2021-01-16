@@ -3,7 +3,12 @@
     <div class="panel-body" style="text-align:center">
       <h1>{{ infos['name'] }}</h1>
       <p style="color:darkgray; font-size: small">{{ infos["gender"] }}，来自{{ infos["location"] }}，于{{ infos["created_at"] }}加入玩具微博。</p>
-      <p style="font-size: large">微博：{{ infos["statusesum"] }}&nbsp;&nbsp;&nbsp;&nbsp;粉丝：{{ infos["followersum"] }}&nbsp;&nbsp;&nbsp;&nbsp;关注：{{ infos["friendsum"] }}&nbsp;&nbsp;&nbsp;&nbsp;点赞：{{ infos["favouritesum"] }}</p>
+      <p style="font-size: large">
+        <a href="{{ url_for('show_profile') }}" style='color: black'>微博：{{ infos["statusesum"] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{{ url_for('show_follower') }}" style='color: black'>粉丝：{{ infos["followersum"] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{{ url_for('show_following') }}" style='color: black'>关注：{{ infos["friendsum"] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        点赞：{{ infos["favouritesum"] }}
+      </p>
       <div class="row">
         <button class="btn btn-info">取消关注</button>
       </div>
