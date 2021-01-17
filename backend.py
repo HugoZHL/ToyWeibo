@@ -17,7 +17,7 @@ prefix = {'u':'http://example.org/user/',
     'ca': 'http://example.org/comment_attr/',
     'r': 'http://example.org/rel/'}
 
-database = 'toyweibo'
+database = 'small'
 u_len = len(prefix['u'])
 w_len = len(prefix['w'])
 c_len = len(prefix['c'])
@@ -39,8 +39,6 @@ _ = gc.load(database)
 
 def run_sparql(l):
     ret = gc.query(database, 'json', prefix_string + l)
-    if not l.startswith('select'):
-        gc.checkpoint(database)
     return ret
 
 def query(l):
@@ -149,6 +147,7 @@ def register(email, screen_name, password, photo):
     user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':'未知地区', 'gender':'', 'photo':photo})
     user_insert_ints(uid, {'followersnum':0, 'friendsnum':0, 'statusesnum':0}) # followers, followings, weibos
     user_insert_strings(uid, {'created_at':time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
+    gc.checkpoint(database)
     return (True, uid)
 
 def login(email, password):
@@ -169,6 +168,7 @@ def update_info_old(uid, email, screen_name, location, url, gender):
         return (False, 'Screen name already exists')
     user_delete_values(uid, ['email', 'screen_name', 'location', 'url', 'gender'])
     user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'location':location, 'url':url, 'gender':gender})
+    gc.checkpoint(database)
     return (True, 'Succeeded')
 
 def change_password(uid, old_pwd, new_pwd):
@@ -178,6 +178,7 @@ def change_password(uid, old_pwd, new_pwd):
     else:
         user_delete_values(uid, ['password'])
         user_insert_strings(uid, {'password': new_pwd})
+        gc.checkpoint(database)
         return True
 
 def update_info(uid, email, screen_name, password, location, gender, photo):
@@ -189,6 +190,7 @@ def update_info(uid, email, screen_name, password, location, gender, photo):
         return (False, 'Screen name already exists')
     user_delete_values(uid, ['email', 'screen_name', 'password', 'location', 'gender', 'photo'])
     user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':location, 'gender':gender, 'photo':photo})
+    gc.checkpoint(database)
     return (True, 'Succeeded')
 
 
@@ -240,11 +242,13 @@ def send_weibo(uid, text, topic):
     _ = run_sparql('insert data { w:%s wa:date \"%s\" }' % (wid, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
     weibo_insert_ints(wid, {'repostsnum':0, 'commentsnum':0, 'attitudesnum':0})
     user_update_int(uid, 'statusesnum', 1)
+    gc.checkpoint(database)
     return wid
 
 def repost_weibo(wid1, wid2):
     _ = run_sparql('insert data { w:%s r:repost w:%s }' % (wid1, wid2))
     weibo_update_int(wid2, 'repostsnum', 1)
+    gc.checkpoint(database)
 
 def repost_list(wid):
     ans = []
@@ -276,6 +280,7 @@ def delete_weibo(wid):
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
         weibo_update_int(wid2, 'repostsnum', -1)
     _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = w:%s && ?y = wa:date ) )  }' % (wid))
+    gc.checkpoint(database)
 
 
 
@@ -364,10 +369,12 @@ def is_liked_by(wid, uid):
 def like_it(wid, uid):
     _ = run_sparql('insert data { w:%s r:likedby u:%s }' % (wid, uid))
     weibo_update_int(wid, 'attitudesnum', 1)
+    gc.checkpoint(database)
 
 def cancel_like_it(wid, uid):
     _ = run_sparql('delete data { w:%s r:likedby u:%s }' % (wid, uid))
     weibo_update_int(wid, 'attitudesnum', -1)
+    gc.checkpoint(database)
 
 
 
@@ -397,12 +404,14 @@ def send_reply(wid, uid, text):
     _ = run_sparql('insert data { c:%s r:cto w:%s }' % (cid, wid))
     _ = run_sparql('insert data { c:%s ca:time \"%s\" }' % (cid, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
     weibo_update_int(wid, 'commentsnum', 1)
+    gc.checkpoint(database)
     return cid
 
 def delete_reply(cid):
     wid = query('select ?wid where { c:%s r:cto ?wid }' % (cid))[0]['wid']['value'][w_len:]
     weibo_update_int(wid, 'commentsnum', -1)
     _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = c:%s && ?y = ca:time ) )  }' % (cid))
+    gc.checkpoint(database)
 
 
 
