@@ -45,9 +45,8 @@ def get_edit_info_from_userid(userID):
     infos = {
         'name': '张三',
         'email': '123@qq.com',
-        'province': '北京',
-        'city': '',
-        'location': '海淀',
+        'url': '',
+        'location': '北京海淀',
         'gender': '男',
     }
     return infos
@@ -91,8 +90,7 @@ def update_infos(userID, request):
     print(
         request.form['email'],
         request.form['name'],
-        request.form['province'],
-        request.form['city'],
+        request.form['url'],
         request.form['location'],
         request.form['gender'],
         request.form['password'],
@@ -197,8 +195,8 @@ def random_ph_search():
 
 # TODO: adsearch result
 def get_adsearch_result(userID, request):
-    email1 = request.form['email1']
-    email2 = request.form['email2']
+    user1 = request.form['user1']
+    user2 = request.form['user2']
     error = None
     infos = {
         2: [
