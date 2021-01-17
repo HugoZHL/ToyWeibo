@@ -10,12 +10,12 @@
     </p>
     <p style="font-size: 1.2em; background-color: lightgrey; border-style: solid; border-width: 10px; border-color: lightgrey;">
       <a href="{{ url_for('show_profile', userID=post.userID) }}" style="color: black;"><strong>{{ post.username }}：</strong></a>
-      <span style="color: blue">{{ post.topic }} </span>{{ post.text }}
+      <span style="color: blue">{{ post.topic }}</span>{{ post.text }}
     </p>
     {% else %}
     <a href="{{ url_for('show_profile', userID=post.userID) }}" style="color: black;"><h4><strong>{{ post.username }}</strong></h4></a>
     <br/>
-    <p style="font-size: 1.2em"><span style="color: blue">{{ post.topic }} </span>{{ post.text }}</p>
+    <p style="font-size: 1.2em"><span style="color: blue">{{ post.topic }}</span>{{ post.text }}</p>
     {% endif %}
     <div>
       <p class="text-left">{{ post.time }}</p>
