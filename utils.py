@@ -214,6 +214,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '0',
         },
         {
             'userID': 1,
@@ -224,6 +225,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '1',
         },)
         ],
         3: [
@@ -236,6 +238,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '2',
         },
         {
             'userID': 1,
@@ -246,6 +249,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '3',
         },
         {
             'userID': 1,
@@ -256,6 +260,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '4',
         })
         ],
         4: [
@@ -268,6 +273,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '5',
         },
         {
             'userID': 1,
@@ -278,6 +284,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '6',
         },{
             'userID': 1,
             'name': 'test2',
@@ -287,6 +294,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '7',
         },{
             'userID': 1,
             'name': 'test2',
@@ -296,6 +304,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '8',
         })
         ],
         5: [
@@ -308,6 +317,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '9',
         },
         {
             'userID': 1,
@@ -318,6 +328,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '10',
         },{
             'userID': 1,
             'name': 'test2',
@@ -327,6 +338,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '11',
         },{
             'userID': 1,
             'name': 'test2',
@@ -336,6 +348,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '12',
         },{
             'userID': 1,
             'name': 'test2',
@@ -345,6 +358,7 @@ def get_adsearch_result(userID, request):
             'followersum': 123,
             'friendsum': 1234,
             'statusesum': 12345,
+            'img_idx': '13',
         })
         ],
     }
