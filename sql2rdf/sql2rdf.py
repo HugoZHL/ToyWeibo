@@ -40,8 +40,8 @@ for l in f.readlines():
         maxuid = max(maxuid, int(uid))
         for i in range(len(attrs)-1):
             o.writelines([ 'u:' + uid + ' ua:' + user_attrs[i+1] + ' ' + attrs[i+1] + ' .\n' ])
-        o.writelines([ 'u:' + uid + ' ua:password ' + attrs[0] + ' .\n' ])
-        o.writelines([ 'u:' + uid + ' ua:email ' + attrs[0] + ' .\n' ])
+        o.writelines([ 'u:' + uid + ' ua:password \"123\" .\n' ])
+        o.writelines([ 'u:' + uid + ' ua:email \"' + uid + '@t\" .\n' ])
     if 'INSERT INTO `userrelation`' in l:
         pos1 = l.find('(')
         pos2 = l.find(',')

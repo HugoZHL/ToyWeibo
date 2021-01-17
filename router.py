@@ -74,7 +74,6 @@ def edit_profile():
                 info = 'Password inconsistent'
             else:
                 g = request.form['gender']
-                print(g)
                 if g == '女':
                     gender = 'f'
                 elif g == '男':
@@ -104,10 +103,7 @@ def result_page(searching=""):
     try:
         myUserID = str(request.cookies['userID'])
         username = request.cookies["username"]
-        ok, info = bc.find_user(searching)
-        results = []
-        if ok:
-            results = [bc.genUserInfo2(bc.genUserInfo(info), myUserID)]
+        results = [bc.genUserInfo2(bc.genUserInfo(uid), myUserID) for uid in bc.find_users(searching)]
         return render_template("searchresult.html", username=username, searching=searching, users=results, title='搜索结果')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -168,7 +164,6 @@ def square():
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
             posts = [bc.genWeibo(wid, userID) for wid in bc.latest_weibo(str(userID))]
-            print(posts)
             return render_template("square.html", username=username, posts=posts, title='广场大厅')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -185,7 +180,6 @@ def recommends():
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
             posts = [bc.genWeibo(wid, userID) for wid in bc.all_weibo()]
-            print(posts)
             return render_template("recommends.html", username=username, posts=posts, title='热点推荐')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -224,7 +218,6 @@ def adsearch():
 @app.route('/follow', methods=['POST'])
 def follow():
     follow_id = request.form['follow']
-    print('follow id:', follow_id)
     uid = request.cookies["userID"]
     follow_id = str(follow_id)
     if not bc.is_following(uid, follow_id):
@@ -235,7 +228,6 @@ def follow():
 @app.route('/unfollow', methods=['POST'])
 def unfollow():
     unfollow_id = request.form['unfollow']
-    print('unfollow id:', unfollow_id)
     uid = request.cookies["userID"]
     unfollow_id = str(unfollow_id)
     if bc.is_following(uid, unfollow_id):
@@ -246,7 +238,6 @@ def unfollow():
 @app.route('/delete_post', methods=['POST'])
 def delete_post():
     wid = request.form['postID']
-    print('delete post', wid)
     wid = str(wid)
     if bc.weibo_exists(wid):
         bc.delete_weibo(wid)
@@ -256,7 +247,6 @@ def delete_post():
 @app.route('/add_post', methods=['POST'])
 def add_post():
     text = request.form['content']
-    print('Add post: ', text)
     topic, text = bc.genTopicText(text)
     uid = request.cookies["userID"]
     _ = bc.send_weibo(uid, text, topic)
@@ -266,7 +256,6 @@ def add_post():
 @app.route('/add_praise', methods=['POST'])
 def add_praise():
     wid = request.form['postID']
-    print('add praise', wid)
     uid = request.cookies["userID"]
     wid = str(wid)
     if not bc.is_liked_by(wid, uid):
@@ -277,7 +266,6 @@ def add_praise():
 @app.route('/delete_praise', methods=['POST'])
 def delete_praise():
     wid = request.form['postID']
-    print('delete praise', wid)
     uid = request.cookies["userID"]
     wid = str(wid)
     if bc.is_liked_by(wid, uid):
@@ -298,14 +286,17 @@ def forward_post():
 
 @app.route('/add_reply', methods=['POST'])
 def add_reply():
-    print('add reply:', request.form['reply_text'])
-    print('to: ', request.form['postid'])
+    wid = str(request.form['postid'])
+    uid = request.cookies["userID"]
+    text = request.form['reply_text']
+    _ = bc.send_reply(wid, uid, text)
     return redirect(request.form['path'])
 
 
 @app.route('/delete_reply', methods=['POST'])
 def delete_reply():
-    print('delete reply', request.form['replyID'])
+    cid = str(request.form['replyID'])
+    bc.delete_reply(cid)
     return redirect(request.form['path'])
 
 

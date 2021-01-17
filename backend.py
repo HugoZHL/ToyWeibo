@@ -186,7 +186,7 @@ def weibo_info(wid):
 
 def latest_weibo(uid):
     ans = []
-    wid_urls = query('select ?wid ?d where { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } order by desc(?d)' % (uid))
+    wid_urls = query('select distinct ?wid ?d where { { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } union { ?wid r:by u:%s . ?wid wa:date ?d } } order by desc(?d)' % (uid, uid))
     for url in wid_urls:
         wid = url['wid']['value'][w_len:]
         ans.append(weibo_info(wid))
@@ -249,7 +249,7 @@ def repost_list(wid):
 def delete_weibo(wid):
     uid = weibo_uid(wid)
     user_update_int(uid, 'statusesnum', -1)
-    wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid2))
+    wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid))
     if len(wid2_urls) > 0:
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
         weibo_update_int(wid2, 'repostsnum', -1)
@@ -267,6 +267,15 @@ def find_user(screen_name):
         return (False, 'User not exist')
     else:
         return (True, uid_urls[0]['uid']['value'][u_len:])
+
+def find_users(searching):
+    keywords = searching.split(' ')
+    filters = ''
+    for w in keywords:
+        if w != '':
+            filters += 'filter regex(?x, \"%s\" ) ' % (w)
+    uid_urls = query('select ?uid where { ?uid ua:screen_name ?x %s}' % (filters))
+    return [url['uid']['value'][u_len:] for url in uid_urls]
 
 def followers(uid):
     uid_urls = query('select ?uid where { ?uid r:follow u:%s }' % (uid))
@@ -356,7 +365,7 @@ def cancel_like_it(wid, uid):
 
 def weibo_reply(wid):
     ans = []
-    cid_urls = query('select ?cid ?uid ?text ?t where { ?cid r:by u:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid } order by desc(?t)' % (wid))
+    cid_urls = query('select ?cid ?uid ?text ?t where { ?cid r:cto w:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid } order by desc(?t)' % (wid))
     for url in cid_urls:
         # replyID, userID, username, text, time, myself
         cid = url['cid']['value'][c_len:]
