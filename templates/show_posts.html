@@ -5,7 +5,7 @@
     {% if post.forwardlist %}
     <p style="font-size: 1.3em;">
       {% for userpost in post.forwardlist %}
-      <a href="{{ url_for('show_profile', userID=userpost[0]) }}" style="color: black;"><strong>{{ userpost[1] }}</strong></a>：{{ userpost[2] }} //
+      <a href="{{ url_for('show_profile', userID=userpost[0]) }}" style="color: black;"><strong>{{ userpost[1] }}</strong></a>：<span style="color: blue">{{ userpost[2] }}</span>{{ userpost[3] }} //
       {% endfor %}
     </p>
     <p style="font-size: 1.2em; background-color: lightgrey; border-style: solid; border-width: 10px; border-color: lightgrey;">
