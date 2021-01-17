@@ -32,7 +32,7 @@ def register():
             ok = False
             info = 'Password inconsistent'
         else:
-            ok, info = bc.register(request.form['email'], request.form['username'], pwd, '', '', '')
+            ok, info = bc.register(request.form['email'], request.form['username'], pwd, '未知地区', '', '')
         if ok:
             resp = make_response(redirect('/square'))
             resp.set_cookie('username', request.form['username'], max_age=3600)
@@ -79,10 +79,10 @@ def edit_profile():
                 elif g == '男':
                     gender = 'm'
                 else:
-                    gender = ''
+                    gender = '其他'
                 # uid, email, screen_name, password, location, url, gender
                 ok, info = bc.update_info(str(userID), request.form['email'], request.form['name'], pwd,
-                                          request.form['location'], request.form['url'], gender)
+                                          request.form['location'], '', gender)
             if not ok:
                 return render_template("edit_profile.html", infos=infos, error=info)
             else:

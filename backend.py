@@ -232,6 +232,8 @@ def repost_list(wid):
     wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
     while len(wid2_urls) > 0:
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
+        if not weibo_exists(wid2):
+            break
         # userID, username, topic, text
         uid = weibo_uid(wid2)
         screen_name = '@' + user_query_value(uid, 'screen_name')
@@ -419,7 +421,7 @@ def genUserInfo(uid):
     elif r[2] == 'm':
         gender = '男'
     else:
-        gender = ''
+        gender = '性别未知或其他'
     infos = {
         'userID': int(uid),
         'name': r[0],
@@ -444,7 +446,7 @@ def genUserInfoEdit(uid):
     r = user_query_values(uid, ['screen_name', 'email', 'url', 'location', 'gender'])
     if r[4] == 'f':
         gender = '女'
-    elif r[2] == 'm':
+    elif r[4] == 'm':
         gender = '男'
     else:
         gender = ''
