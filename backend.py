@@ -219,7 +219,7 @@ def weibo_info(wid):
 
 def latest_weibo(uid):
     ans = []
-    wid_urls = query('select distinct ?wid ?d where { { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } union { ?wid r:by u:%s . ?wid wa:date ?d } } order by desc(?d) limit 100' % (uid, uid))
+    wid_urls = query('select distinct ?wid ?d where { { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } union { ?wid r:by u:%s . ?wid wa:date ?d } } order by desc(?d) limit 50' % (uid, uid))
     for url in wid_urls:
         wid = url['wid']['value'][w_len:]
         ans.append(weibo_info(wid))
@@ -227,7 +227,7 @@ def latest_weibo(uid):
 
 def all_weibo():
     ans = []
-    wid_urls = query('select ?wid ?d where { ?wid wa:date ?d } order by desc(?d) limit 100')
+    wid_urls = query('select ?wid ?d where { ?wid wa:date ?d } order by desc(?d) limit 50')
     for url in wid_urls:
         wid = url['wid']['value'][w_len:]
         ans.append(weibo_info(wid))
