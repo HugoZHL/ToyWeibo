@@ -34,15 +34,17 @@ class Weibo(object):
 
 class Reply(object):
     __slots__ = [
+        'replyID',
+        'userID',
         'username',
         'text',
         'time',
-        'praisesum',
-        'target', # target username
+        'myself',
     ]
-    def __init__(self, username, text, time, praisesum, target):
+    def __init__(self, replyID, userID, username, text, time, myself):
+        self.replyID = replyID
+        self.userID = userID
         self.username = username
         self.text = text
         self.time = time
-        self.praisesum = praisesum
-        self.target = target
+        self.myself = myself

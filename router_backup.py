@@ -239,12 +239,15 @@ def forward_post():
 
 @app.route('/add_reply', methods=['POST'])
 def add_reply():
-    pass
+    print('add reply:', request.form['reply_text'])
+    print('to: ', request.form['postid'])
+    return redirect(request.form['path'])
 
 
 @app.route('/delete_reply', methods=['POST'])
 def delete_reply():
-    pass
+    print('delete reply', request.form['replyID'])
+    return redirect(request.form['path'])
 
 
 
