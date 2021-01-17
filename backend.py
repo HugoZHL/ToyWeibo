@@ -1,6 +1,6 @@
 
 # sudo bin/gbuild toyweibo ../ToyWeibo/sql2rdf/small.nt
-# sudo bin/ghttp 9000 toyweibo &
+# sudo bin/ghttp 9000 toyweibo
 # sudo bin/shutdown 9000
 # sudo bin/gdrop toyweibo
 
@@ -136,8 +136,8 @@ def weibo_update_int(wid, k, delta):
 def handle_bad(ls):
     return [l.replace('\\', '\\\\').replace('\"', '\\\"') for l in ls]
 
-def register(email, screen_name, password, location, url, gender):
-    email, screen_name, password, location, url, gender = handle_bad([email, screen_name, password, location, url, gender])
+def register(email, screen_name, password, photo):
+    email, screen_name, password, photo = handle_bad([email, screen_name, password, photo])
     if not is_unique('email', email):
         return (False, 'Email already exists')
     if not is_unique('screen_name', screen_name):
@@ -146,7 +146,7 @@ def register(email, screen_name, password, location, url, gender):
     next_uid = str(int(uid) + 1)
     _ = run_sparql('delete data { u:next r:is \"%s\" }' % (uid))
     _ = run_sparql('insert data { u:next r:is \"%s\" }' % (next_uid))
-    user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':location, 'url':url, 'gender':gender})
+    user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':'未知地区', 'gender':'', 'photo':photo})
     user_insert_ints(uid, {'followersnum':0, 'friendsnum':0, 'statusesnum':0}) # followers, followings, weibos
     user_insert_strings(uid, {'created_at':time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())})
     return (True, uid)
@@ -180,15 +180,15 @@ def change_password(uid, old_pwd, new_pwd):
         user_insert_strings(uid, {'password': new_pwd})
         return True
 
-def update_info(uid, email, screen_name, password, location, url, gender):
-    email, screen_name, password, location, url, gender = handle_bad([email, screen_name, password, location, url, gender])
+def update_info(uid, email, screen_name, password, location, gender, photo):
+    email, screen_name, password, location, gender, photo = handle_bad([email, screen_name, password, location, gender, photo])
     cur_email, cur_screen_name = user_query_values(uid, ['email', 'screen_name'])
     if not email == cur_email and not is_unique('email', email):
         return (False, 'Email already exists')
     if not screen_name == cur_screen_name and not is_unique('screen_name', screen_name):
         return (False, 'Screen name already exists')
-    user_delete_values(uid, ['email', 'screen_name', 'password', 'location', 'url', 'gender'])
-    user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':location, 'url':url, 'gender':gender})
+    user_delete_values(uid, ['email', 'screen_name', 'password', 'location', 'gender', 'photo'])
+    user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':location, 'gender':gender, 'photo':photo})
     return (True, 'Succeeded')
 
 
@@ -375,7 +375,7 @@ def cancel_like_it(wid, uid):
 
 def weibo_reply(wid):
     ans = []
-    cid_urls = query('select ?cid ?uid ?text ?t where { ?cid r:cto w:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid } order by desc(?t)' % (wid))
+    cid_urls = query('select ?cid ?uid ?text ?t ?photo where { ?cid r:cto w:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid . ?uid ua:photo ?photo } order by desc(?t)' % (wid))
     for url in cid_urls:
         # replyID, userID, username, text, time, myself
         cid = url['cid']['value'][c_len:]
@@ -383,7 +383,8 @@ def weibo_reply(wid):
         username = user_query_value(uid, 'screen_name')
         text = url['text']['value']
         t = url['t']['value']
-        ans.append([cid, uid, username, text, t])
+        photo = url['photo']['value']
+        ans.append([cid, uid, username, text, t, photo])
     return ans
 
 def send_reply(wid, uid, text):
@@ -437,12 +438,13 @@ def genUserInfoFromR(uid, r):
         'friendsum': int(r[4]),
         'statusesum': int(r[5]),
         'created_at': r[6],
+        'img_idx': r[7],
     }
     return infos
 
 def genUserInfo(uid):
     uid = str(uid)
-    r = user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
+    r = user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at', 'photo'])
     return genUserInfoFromR(uid, r)
 
 # user_query_values_filter
@@ -450,7 +452,7 @@ def genUserInfo(uid):
 def genUserInfoFilter(fil, myuid):
     myuid = str(myuid)
     myfollows = set(followings(myuid))
-    rs = user_query_values_filter(fil, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
+    rs = user_query_values_filter(fil, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at', 'photo'])
     all_infos = []
     for r in rs:
         uid = r[0]
@@ -476,19 +478,19 @@ def genFollowers(uid, myuid):
 
 def genUserInfoEdit(uid):
     uid = str(uid)
-    r = user_query_values(uid, ['screen_name', 'email', 'url', 'location', 'gender'])
-    if r[4] == 'f':
+    r = user_query_values(uid, ['screen_name', 'email', 'location', 'gender', 'photo'])
+    if r[3] == 'f':
         gender = '女'
-    elif r[4] == 'm':
+    elif r[3] == 'm':
         gender = '男'
     else:
         gender = ''
     infos = {
         'name': r[0],
         'email': r[1],
-        'url': r[2],
-        'location': r[3],
+        'location': r[2],
         'gender': gender,
+        'img_idx': r[4],
     }
     return infos
 
@@ -496,13 +498,13 @@ def genReply(c, myuid):
     myuid = str(myuid)
     myself = (c[1] == myuid)
     # replyID, userID, username, text, time, myself
-    return Reply(int(c[0]), int(c[1]), c[2], c[3], c[4], myself)
+    return Reply(int(c[0]), int(c[1]), c[2], c[3], c[4], myself, c[5])
 
 def genWeibo(wid, myuid):
     wid = str(wid)
     myuid = str(myuid)
     uid = weibo_uid(wid)
-    username = user_query_value(uid, 'screen_name')
+    username, img_idx = user_query_values(uid, ['screen_name', 'photo'])
     r = weibo_query_values(wid, ['text', 'date', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'])
     userID = int(uid)
     text = r[0]
@@ -520,10 +522,10 @@ def genWeibo(wid, myuid):
         rshow += rr[1] + '：' + rr[2] + rr[3] + ' // '
     replies = [genReply(c, myuid) for c in weibo_reply(wid)]
 
-    # (self, userID, postID, username, text, time, repostsum, commentsum, attitudesum, topic, forwardlist, forwardshow, replies)
+    # (self, userID, postID, username, text, time, repostsum, commentsum, attitudesum, topic, forwardlist, forwardshow, img_idx, replies)
     # weibo2 = Weibo(2, 4, '@test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '#天气#', [(1, 'test2','#感想#', '不错'),
     # (1, '@test3','#感想#', '不错'), (1, '@test4','#感想#', '不错')], 'test2：#感想# 不错 // @test3：#感想# 不错 // @test4：#感想# 不错 // ', [])
-    wb = Weibo(userID, int(wid), username, text, r[1], int(r[2]), int(r[3]), int(r[4]), topic, rlist, rshow, replies)
+    wb = Weibo(userID, int(wid), username, text, r[1], int(r[2]), int(r[3]), int(r[4]), topic, rlist, rshow, img_idx, replies)
     wb.myself = (myuid == uid)
     wb.praised = is_liked_by(wid, myuid)
     return wb

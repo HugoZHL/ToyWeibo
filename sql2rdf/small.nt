@@ -20,6 +20,7 @@ u:1 ua:favouritesnum 0 .
 u:1 ua:created_at "2011-10-07 18:54:43" .
 u:1 ua:password "123" .
 u:1 ua:email "1@t" .
+u:1 ua:photo "19" .
 u:2 ua:screen_name "百年润发One" .
 u:2 ua:name "百年润发One" .
 u:2 ua:province 42 .
@@ -34,6 +35,7 @@ u:2 ua:favouritesnum 0 .
 u:2 ua:created_at "2012-08-06 14:44:20" .
 u:2 ua:password "123" .
 u:2 ua:email "2@t" .
+u:2 ua:photo "19" .
 u:3 ua:screen_name "互联网的那点事" .
 u:3 ua:name "互联网的那点事" .
 u:3 ua:province 400 .
@@ -48,6 +50,7 @@ u:3 ua:favouritesnum 331 .
 u:3 ua:created_at "2009-08-28 11:55:09" .
 u:3 ua:password "123" .
 u:3 ua:email "3@t" .
+u:3 ua:photo "13" .
 u:1 r:follow u:2 .
 w:1 wa:date "2014-04-30 15:53:35" .
 w:1 wa:text "魅族MX3，配件齐全，充电头保护套贴膜支架剪卡器全赠送，代理拿货价¥1760，想当代理的评论留电话，Amy跟你聊聊天" .
@@ -85,7 +88,7 @@ w:1 r:repost w:2 .
 
 w:4 r:likedby u:3 .
 c:1 ca:text "nice" .
-c:1 ca:time "2021-01-16 23:05:40" .
+c:1 ca:time "2021-01-17 03:24:28" .
 c:1 r:cby u:3 .
 c:1 r:cto w:4 .
 u:next r:is "4" .

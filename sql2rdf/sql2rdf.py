@@ -1,5 +1,6 @@
 
 import time
+import random
 
 user_attrs = ['uid', 'screen_name', 'name', 'province', 'city', 'location', 'url', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'favouritesnum', 'created_at']
 weibo_attrs = ['mid', 'date', 'text', 'source', 'repostsnum', 'commentsnum', 'attitudesnum', 'uid', 'topic']
@@ -42,6 +43,8 @@ for l in f.readlines():
             o.writelines([ 'u:' + uid + ' ua:' + user_attrs[i+1] + ' ' + attrs[i+1] + ' .\n' ])
         o.writelines([ 'u:' + uid + ' ua:password \"123\" .\n' ])
         o.writelines([ 'u:' + uid + ' ua:email \"' + uid + '@t\" .\n' ])
+        o.writelines([ 'u:' + uid + ' ua:photo \"' + str(random.randint(0, 25)) + '\" .\n' ])
+
     if 'INSERT INTO `userrelation`' in l:
         pos1 = l.find('(')
         pos2 = l.find(',')
