@@ -5,7 +5,7 @@
         <div class="row">
           <input type="hidden" name="path" value="{{ request.path }}"/>
           <label for="weiboc" style="font-size: large;">分享新鲜事...（140字以内）</label>
-          <textarea class="form-control" rows="3" name="content" id="weiboc" placeholder="可在微博开头使用#话题#"></textarea>
+          <textarea maxlength="140" class="form-control" rows="3" name="content" id="weiboc" placeholder="可在微博开头使用#话题#"></textarea>
         </div>
         <br/>
         <div class="row" style="text-align:right">

@@ -73,7 +73,7 @@
         <form method="post" action='/add_reply'>
           <div class="form-group">
             <!-- <label for="message-text" class="col-form-label">Message:</label> -->
-            <textarea class="form-control" id="message-text" placeholder="写评论..." name='reply_text'></textarea>
+            <textarea maxlength="140" class="form-control" id="message-text" placeholder="写评论..." name='reply_text'></textarea>
           </div>
           <input type="hidden" name="postid" value="{{ post.postID }}"/>
           <input type="hidden" name="path" value="{{ request.path }}"/>
@@ -105,7 +105,7 @@
         <form method="post" action='/forward_post'>
           <div class="form-group">
             <!-- <label for="message-text" class="col-form-label">Message:</label> -->
-            <textarea class="form-control" id="message-text" placeholder="来说说分享心得..." name='forward_text'></textarea>
+            <textarea maxlength="140" class="form-control" id="message-text" placeholder="来说说分享心得..." name='forward_text'></textarea>
           </div>
           <div class="form-group">
             <!-- <label for="message-text" class="col-form-label">Message:</label> -->
