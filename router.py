@@ -193,8 +193,8 @@ def adsearch():
         userID = int(request.cookies["userID"])
         username = request.cookies["username"]
         if request.method == 'POST':
-            ok1, uid1 = bc.find_user(request.form['email1'])
-            ok2, uid2 = bc.find_user(request.form['email2'])
+            ok1, uid1 = bc.find_user(request.form['user1'])
+            ok2, uid2 = bc.find_user(request.form['user2'])
             if not ok1 or not ok2:
                 return render_template("adsearch.html", error='User not exist')
             result = bc.routes4(uid1, uid2)
