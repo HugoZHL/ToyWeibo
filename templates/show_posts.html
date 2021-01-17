@@ -1,7 +1,10 @@
 {% for post in posts  %}
 <hr/>
 <div class="row">
-  <div class="col-md-12 col-lg-12">
+  <div class="col-md-1 col-lg-1">
+    <img src="{{ url_for('static', filename='images/avatars/IMG' + post.img_idx + '.jpg') }}" width="80" height="80" style="margin-top:0.7em"/>
+  </div>
+  <div class="col-md-11 col-lg-11">
     {% if post.forwardlist %}
     <p style="font-size: 1.3em;">
       {% for userpost in post.forwardlist %}
@@ -53,22 +56,27 @@
     <div class="collapse multi-collapse" id="{{ post.postID }}">
       {% for reply in post.replies %}
       <br/>
-      <div class="col-md-11 col-lg-11">
-        <p>
-          <a href="{{ url_for('show_profile', userID=reply.userID) }}" style="color: black;"><strong>{{ reply.username }}</strong></a>：{{ reply.text }}<br/>{{ reply.time }}
-          
-        </p>
-      </div>
-      <div class="col-md-1 col-lg-1">
-        {% if reply.myself %}
-        <form action="/delete_reply" method="post" class="btn text-right">
-          <input type="hidden" name="replyID" value="{{ reply.replyID }}" />
-          <input type="hidden" name="path" value="{{ request.path }}" />
-          <a href="#" onclick="this.parentNode.submit()" type='submit' style="color: darkred;"><img src="{{ url_for('static', filename='images/icons/shanchu.png') }}" height="15" width="15"/> &nbsp;删除</a>
-        </form>
-        {% endif %}
+      <div class="row">
+        <div class="col-md-1 col-lg-1">
+          <img src="{{ url_for('static', filename='images/avatars/IMG' + reply.img_idx + '.jpg') }}" width="40" height="40" style="margin-top:0.15em; margin-left: 3em;"/>
+        </div>
+        <div class="col-md-10 col-lg-10">
+          <p>
+            <a href="{{ url_for('show_profile', userID=reply.userID) }}" style="color: black;"><strong>{{ reply.username }}</strong></a>：{{ reply.text }}<br/>{{ reply.time }}
+          </p>
+        </div>
+        <div class="col-md-1 col-lg-1">
+          {% if reply.myself %}
+          <form action="/delete_reply" method="post" class="btn text-left">
+            <input type="hidden" name="replyID" value="{{ reply.replyID }}" />
+            <input type="hidden" name="path" value="{{ request.path }}" />
+            <a href="#" onclick="this.parentNode.submit()" type='submit' style="color: darkred;"><img src="{{ url_for('static', filename='images/icons/shanchu.png') }}" height="15" width="15"/> &nbsp;删除</a>
+          </form>
+          {% endif %}
+        </div>
       </div>
       {% endfor %}
+      <br/>
       <div class="col-md-12 col-lg-12">
         <form method="post" action='/add_reply'>
           <div class="form-group">

@@ -1,6 +1,7 @@
 <div class="p-2" style="width: 100%;">
   <div class="container">
     <div class="panel-body" style="text-align:center">
+      <img src="{{ url_for('static', filename='images/avatars/IMG' + infos['img_idx'] + '.jpg') }}" height="200" width="200"/>
       <h1>{{ infos['name'] }}</h1>
       <p style="color:darkgray; font-size: small">{{ infos["gender"] }}，来自{{ infos["location"] }}，于{{ infos["created_at"] }}加入玩具微博。</p>
       <p style="font-size: large">
