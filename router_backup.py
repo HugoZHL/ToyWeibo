@@ -80,6 +80,7 @@ def edit_profile():
 def result_page(searching=""):
     if not searching or request.method=='POST':
         searching = request.form['searching']
+        return redirect('/searchresult/%s' % searching)
     try:
         myUserID = int(request.cookies['userID'])
         username = request.cookies["username"]
@@ -175,6 +176,9 @@ def recommends():
 
 @app.route('/adsearch', methods=['GET', 'POST'])
 def adsearch():
+    if request.method == 'POST' and 'searching' in request.form:
+        searching = request.form['searching']
+        return redirect('/searchresult/%s' % searching)
     error = None
     try:
         userID = int(request.cookies["userID"])
