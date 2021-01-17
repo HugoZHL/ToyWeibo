@@ -2,9 +2,21 @@
 <hr/>
 <div class="row">
   <div class="col-md-12 col-lg-12">
+    {% if post.forwardlist %}
+    <p style="font-size: 1.3em;">
+      {% for userpost in post.forwardlist %}
+      <a href="{{ url_for('show_profile', userID=userpost[0]) }}" style="color: black;"><strong>{{ userpost[1] }}</strong></a>：{{ userpost[2] }} //
+      {% endfor %}
+    </p>
+    <p style="font-size: 1.2em; background-color: lightgrey; border-style: solid; border-width: 10px; border-color: lightgrey;">
+      <a href="{{ url_for('show_profile', userID=post.userID) }}" style="color: black;"><strong>{{ post.username }}：</strong></a>
+      <span style="color: blue">{{ post.topic }} </span>{{ post.text }}
+    </p>
+    {% else %}
     <a href="{{ url_for('show_profile', userID=post.userID) }}" style="color: black;"><h4><strong>{{ post.username }}</strong></h4></a>
     <br/>
     <p style="font-size: 1.2em"><span style="color: blue">{{ post.topic }} </span>{{ post.text }}</p>
+    {% endif %}
     <div>
       <p class="text-left">{{ post.time }}</p>
       <div class="text-right">
@@ -29,7 +41,7 @@
         </form>
         {% endif %}
         <a class="btn text-right"><img src="{{ url_for('static', filename='images/icons/pinglun.png') }}" height="15" width="15"/> &nbsp;评论 {{ post.commentsum }}</a>
-        <a type="button" data-toggle="modal" data-target="#forward" class="btn text-right" data-postid="{{ post.postID }}" data-topic="{{ post.topic }}" data-content="{{ post.text }}"><img src="{{ url_for('static', filename='images/icons/fenxiang.png') }}" height="15" width="15"/> &nbsp;转发 {{ post.repostsum }}</a>
+        <a type="button" data-toggle="modal" data-target="#forward" class="btn text-right" data-postid="{{ post.postID }}" data-content="{{ post.forwardshow+post.username+'：'+post.topic+' '+post.text }}"><img src="{{ url_for('static', filename='images/icons/fenxiang.png') }}" height="15" width="15"/> &nbsp;转发 {{ post.repostsum }}</a>
       </div>
     </div>
   </div>
@@ -58,12 +70,14 @@
           </div>
           <div class="form-group">
             <!-- <label for="message-text" class="col-form-label">Message:</label> -->
-            <input type="text" class="form-control" id="content" disabled/>
+            <textarea type="text" class="form-control" id="content" disabled></textarea>
           </div>
           <input type="hidden" name="postid" id="postid"/>
           <input type="hidden" name="path" value="{{ request.path }}"/>
-          <button type="button" class="btn btn-secondary" data-dismiss="modal" style="text-align: right;">关闭</button>
-          <button type="submit" class="btn btn-primary" style="text-align: right;">转发！</button>
+          <div class="form-group" style="text-align: right;">
+            <button type="submit" class="btn btn-primary" style="text-align: right;">转发！</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" style="text-align: right;">关闭</button>
+          </div>
         </form>
       </div>
     </div>
@@ -75,12 +89,11 @@
 $('#forward').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   var content = button.data('content') // Extract info from data-* attributes
-  var topic = button.data('topic')
   var postid = button.data('postid')
   // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   var modal = $(this)
-  modal.find('#content').val(topic + ' ' + content)
+  modal.find('#content').val(content)
   modal.find('#postid').val(postid)
   // modal.find('.modal-title').text('New message to ' + recipient)
   // modal.find('.modal-body input').val(recipient)
