@@ -17,7 +17,7 @@ prefix = {'u':'http://example.org/user/',
     'ca': 'http://example.org/comment_attr/',
     'r': 'http://example.org/rel/'}
 
-database = 'small'
+database = 'toyweibo'
 u_len = len(prefix['u'])
 w_len = len(prefix['w'])
 c_len = len(prefix['c'])
