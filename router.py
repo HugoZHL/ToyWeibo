@@ -1,56 +1,7 @@
 from flask import *
-from structs import *
 import backend as bc
 
 app = Flask(__name__)
-
-def genUserInfo(uid):
-    uid = str(uid)
-    r = bc.user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
-    infos = {
-        'userID': int(uid),
-        'name': r[0],
-        'location': r[1],
-        'gender': r[2],
-        'followersum': int(r[3]),
-        'friendsum': int(r[4]),
-        'statusesum': int(r[5]),
-        'created_at': r[6],
-    }
-    return infos
-
-def genUserInfo2(infos, myuid):
-    myuid = str(myuid)
-    uid = str(infos['userID'])
-    infos['following'] = bc.is_following(myuid, uid)
-    infos['ismyself'] = (myuid == uid)
-    return infos
-
-def genUserInfoBad(uid):
-    uid = str(uid)
-    r = bc.user_query_values(uid, ['screen_name', 'email', 'location', 'gender'])
-    infos = {
-        'name': r[0],
-        'email': r[1],
-        'province': '',
-        'city': '',
-        'location': r[2],
-        'gender': r[3],
-    }
-    return infos
-
-def genWeibo(wid, myuid):
-    wid = str(wid)
-    myuid = str(myuid)
-    uid = bc.weibo_uid(wid)
-    username = bc.user_query_value(uid, 'screen_name')
-    r = bc.weibo_query_values(wid, ['text', 'date', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'])
-    # (self, userID, postID, username, text, time, repostsum, commentsum, attitudesum, topic, replies)
-    # Weibo(0, 1, 'test1', '今天天气真好', '2020年1月1日13:45', 1, 2, 3, '天气', [])
-    wb = Weibo(int(uid), int(wid), username, r[0], r[1], int(r[2]), int(r[3]), int(r[4]), r[5], [])
-    wb.myself = (myuid == uid)
-    wb.praised = bc.is_liked_by(wid, myuid)
-    return wb
 
 @app.route("/")
 def homepage():
@@ -101,8 +52,8 @@ def show_profile(userID=0):
         myuid = request.cookies['userID']
         myself = (userID == int(myuid))
         follow = bc.is_following(str(myuid), str(userID))
-        infos = genUserInfo(userID)
-        posts = [genWeibo(wid, myuid) for wid in bc.user_weibo(str(userID))]
+        infos = bc.genUserInfo(userID)
+        posts = [bc.genWeibo(wid, myuid) for wid in bc.user_weibo(str(userID))]
         username = request.cookies['username']
         return render_template("profile.html", username=username, myself=myself, follow=follow, infos=infos, posts=posts, title='个人主页')
     except KeyError:
@@ -114,15 +65,25 @@ def edit_profile():
     try:
         info = None
         userID = int(request.cookies["userID"])
-        infos = genUserInfoBad(userID)
+        infos = bc.genUserInfoEdit(userID)
         if request.method == 'POST':
+            userID = int(request.cookies["userID"])
             pwd = request.form['password']
             if pwd != request.form['rpassword']:
                 ok = False
                 info = 'Password inconsistent'
             else:
+                g = request.form['gender']
+                print(g)
+                if g == '女':
+                    gender = 'f'
+                elif g == '男':
+                    gender = 'm'
+                else:
+                    gender = ''
                 # uid, email, screen_name, password, location, url, gender
-                ok, info = bc.update_info(str(userID), request['email'], request['name'], pwd, request['location'], '', request['gender'])
+                ok, info = bc.update_info(str(userID), request.form['email'], request.form['name'], pwd,
+                                          request.form['location'], request.form['url'], gender)
             if not ok:
                 return render_template("edit_profile.html", infos=infos, error=info)
             else:
@@ -146,7 +107,7 @@ def result_page(searching=""):
         ok, info = bc.find_user(searching)
         results = []
         if ok:
-            results = [genUserInfo2(genUserInfo(info), myUserID)]
+            results = [bc.genUserInfo2(bc.genUserInfo(info), myUserID)]
         return render_template("searchresult.html", username=username, searching=searching, users=results, title='搜索结果')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -166,8 +127,8 @@ def show_following(userID=0):
                 userID = myUserID
             myself = (userID == myUserID)
             follow = bc.is_following(str(myUserID), str(userID))
-            infos = genUserInfo(userID)
-            followings = [genUserInfo2(genUserInfo(uid), myUserID) for uid in bc.followings(str(userID))]
+            infos = bc.genUserInfo(userID)
+            followings = [bc.genUserInfo2(bc.genUserInfo(uid), myUserID) for uid in bc.followings(str(userID))]
             username = request.cookies['username']
             return render_template("followings.html", username=username, myself=myself, follow=follow, infos=infos, users=followings, title='关注列表')
     except KeyError:
@@ -188,8 +149,8 @@ def show_follower(userID=0):
                 userID = myUserID
             myself = (userID == myUserID)
             follow = bc.is_following(str(myUserID), str(userID))
-            infos = genUserInfo(userID)
-            followers = [genUserInfo2(genUserInfo(uid), myUserID) for uid in bc.followers(str(userID))]
+            infos = bc.genUserInfo(userID)
+            followers = [bc.genUserInfo2(bc.genUserInfo(uid), myUserID) for uid in bc.followers(str(userID))]
             username = request.cookies['username']
             return render_template("followers.html", username=username, myself=myself, follow=follow, infos=infos, users=followers, title='粉丝列表')
     except KeyError:
@@ -206,7 +167,7 @@ def square():
         else:
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
-            posts = [genWeibo(wid, userID) for wid in bc.latest_weibo(str(userID))]
+            posts = [bc.genWeibo(wid, userID) for wid in bc.latest_weibo(str(userID))]
             print(posts)
             return render_template("square.html", username=username, posts=posts, title='广场大厅')
     except KeyError:
@@ -223,7 +184,7 @@ def recommends():
         else:
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
-            posts = [genWeibo(wid, userID) for wid in bc.all_weibo()]
+            posts = [bc.genWeibo(wid, userID) for wid in bc.all_weibo()]
             print(posts)
             return render_template("recommends.html", username=username, posts=posts, title='热点推荐')
     except KeyError:
@@ -247,7 +208,7 @@ def adsearch():
             info_keys = set()
             for r in result:
                 cnt = len(r)
-                re = tuple([genUserInfo(uid) for uid in r])
+                re = tuple([bc.genUserInfo(uid) for uid in r])
                 if cnt in info_keys:
                     infos[cnt].append(re)
                 else:
@@ -288,7 +249,6 @@ def delete_post():
     print('delete post', wid)
     wid = str(wid)
     if bc.weibo_exists(wid):
-        print('I am trying to delete it...')
         bc.delete_weibo(wid)
     return redirect(request.form['path'])
 
@@ -297,14 +257,9 @@ def delete_post():
 def add_post():
     text = request.form['content']
     print('Add post: ', text)
-    topic = ''
-    if text[0] == '#':
-        pos = text.find('#', 1)
-        if pos > 0:
-            topic = text[1:pos]
-            text = text[pos+1:]
+    topic, text = bc.genTopicText(text)
     uid = request.cookies["userID"]
-    bc.send_weibo(uid, text, topic)
+    _ = bc.send_weibo(uid, text, topic)
     return redirect(request.form['path'])
 
 
@@ -332,19 +287,26 @@ def delete_praise():
 
 @app.route('/forward_post', methods=['POST'])
 def forward_post():
-    print('forward post', request.form['postid'])
-    print('new text', request.form['forward_text'])
+    text = request.form['forward_text']
+    topic, text = bc.genTopicText(text)
+    uid = request.cookies["userID"]
+    wid1 = bc.send_weibo(uid, text, topic)
+    wid2 = request.form['postid']
+    bc.repost_weibo(wid1, wid2)
     return redirect(request.form['path'])
 
 
 @app.route('/add_reply', methods=['POST'])
 def add_reply():
-    pass
+    print('add reply:', request.form['reply_text'])
+    print('to: ', request.form['postid'])
+    return redirect(request.form['path'])
 
 
 @app.route('/delete_reply', methods=['POST'])
 def delete_reply():
-    pass
+    print('delete reply', request.form['replyID'])
+    return redirect(request.form['path'])
 
 
 

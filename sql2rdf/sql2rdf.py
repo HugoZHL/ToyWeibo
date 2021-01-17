@@ -1,4 +1,6 @@
 
+import time
+
 user_attrs = ['uid', 'screen_name', 'name', 'province', 'city', 'location', 'url', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'favouritesnum', 'created_at']
 weibo_attrs = ['mid', 'date', 'text', 'source', 'repostsnum', 'commentsnum', 'attitudesnum', 'uid', 'topic']
 
@@ -7,8 +9,10 @@ o = open('small.nt', 'w')
 
 o.writelines(['@prefix u:   <http://example.org/user/> .\n'])
 o.writelines(['@prefix w:   <http://example.org/weibo/> .\n'])
+o.writelines(['@prefix c:   <http://example.org/comment/> .\n'])
 o.writelines(['@prefix ua:  <http://example.org/user_attr/> .\n'])
 o.writelines(['@prefix wa:  <http://example.org/weibo_attr/> .\n'])
+o.writelines(['@prefix ca:  <http://example.org/comment_attr/> .\n'])
 o.writelines(['@prefix r:   <http://example.org/rel/> .\n\n'])
 
 def parse_string(l, cnt, long_id):
@@ -63,6 +67,14 @@ for l in f.readlines():
         o.writelines([ 'w:' + wid1 + ' r:repost w:' + wid2 + ' .\n' ])
 
 f.close()
+o.writelines([ '\nw:' + str(maxwid) + ' r:likedby u:' + str(maxuid) + ' .\n' ])
+
+o.writelines([ 'c:1 ca:text \"nice\" .\n' ])
+o.writelines([ 'c:1 ca:time \"' + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + '\" .\n' ])
+o.writelines([ 'c:1 r:cby u:' + str(maxuid) + ' .\n' ])
+o.writelines([ 'c:1 r:cto w:' + str(maxwid) + ' .\n' ])
+
 o.writelines([ 'u:next r:is \"' + str(maxuid+1) + '\" .\n' ])
 o.writelines([ 'w:next r:is \"' + str(maxwid+1) + '\" .\n' ])
+o.writelines([ 'c:next r:is \"2\" .\n' ])
 o.close()

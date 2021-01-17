@@ -1,22 +1,26 @@
 
 # sudo bin/gbuild toyweibo ../ToyWeibo/sql2rdf/small.nt
-# sudo bin/ghttp 9000 toyweibo
+# sudo bin/ghttp 9000 toyweibo &
 # sudo bin/shutdown 9000
 # sudo bin/gdrop toyweibo
 
 import GstoreConnector
 import json
 import time
+from structs import *
 
 prefix = {'u':'http://example.org/user/', 
     'w': 'http://example.org/weibo/',
+    'c': 'http://example.org/comment/',
     'ua': 'http://example.org/user_attr/',
     'wa': 'http://example.org/weibo_attr/',
+    'ca': 'http://example.org/comment_attr/',
     'r': 'http://example.org/rel/'}
 
 database = 'toyweibo'
 u_len = len(prefix['u'])
 w_len = len(prefix['w'])
+c_len = len(prefix['c'])
 prefix_string = ''.join(['prefix %s:<%s> ' % (k,v) for k,v in prefix.items()])
 gc = GstoreConnector.GstoreConnector('localhost', 9000, 'root', '123456')
 _ = gc.load(database)
@@ -168,7 +172,7 @@ def update_info(uid, email, screen_name, password, location, url, gender):
     return (True, 'Succeeded')
 
 
-# weibo management except delete (in others)
+# weibo management
 
 def weibo_exists(wid):
     return len(query('select ?d where { w:%s wa:date ?d }' % (wid))) != 0
@@ -216,6 +220,41 @@ def send_weibo(uid, text, topic):
     _ = run_sparql('insert data { w:%s wa:date \"%s\" }' % (wid, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
     weibo_insert_ints(wid, {'repostsnum':0, 'commentsnum':0, 'attitudesnum':0})
     user_update_int(uid, 'statusesnum', 1)
+    return wid
+
+def repost_weibo(wid1, wid2):
+    _ = run_sparql('insert data { w:%s r:repost w:%s }' % (wid1, wid2))
+    weibo_update_int(wid2, 'repostsnum', 1)
+
+def repost_list(wid):
+    ans = []
+    wid1 = wid
+    wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
+    while len(wid2_urls) > 0:
+        wid2 = wid2_urls[0]['wid']['value'][w_len:]
+        # userID, username, topic, text
+        uid = weibo_uid(wid2)
+        screen_name = '@' + user_query_value(uid, 'screen_name')
+        topic = ''
+        text = '此微博已删除'
+        if weibo_exists(wid2):
+            topic, text = weibo_query_values(wid2, ['topic', 'text'])
+            if topic != '':
+                topic = '#' + topic + '#' + ' '
+        ans.append((int(uid), screen_name, topic, text))
+        wid1 = wid2
+        wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
+    return ans
+
+def delete_weibo(wid):
+    uid = weibo_uid(wid)
+    user_update_int(uid, 'statusesnum', -1)
+    wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid2))
+    if len(wid2_urls) > 0:
+        wid2 = wid2_urls[0]['wid']['value'][w_len:]
+        weibo_update_int(wid2, 'repostsnum', -1)
+    _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = w:%s && ?y = wa:date ) )  }' % (wid))
+
 
 
 
@@ -313,14 +352,42 @@ def cancel_like_it(wid, uid):
 
 
 
+# reply
+
+def weibo_reply(wid):
+    ans = []
+    cid_urls = query('select ?cid ?uid ?text ?t where { ?cid r:by u:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid } order by desc(?t)' % (wid))
+    for url in cid_urls:
+        # replyID, userID, username, text, time, myself
+        cid = url['cid']['value'][c_len:]
+        uid = url['uid']['value'][u_len:]
+        username = user_query_value(uid, 'screen_name')
+        text = url['text']['value']
+        t = url['t']['value']
+        ans.append([cid, uid, username, text, t])
+    return ans
+
+def send_reply(wid, uid, text):
+    cid = query('select ?cid where { c:next r:is ?cid }')[0]['cid']['value']
+    next_cid = str(int(cid) + 1)
+    _ = run_sparql('delete data { c:next r:is \"%s\" }' % (cid))
+    _ = run_sparql('insert data { c:next r:is \"%s\" }' % (next_cid))
+    _ = run_sparql('insert data { c:%s ca:text \"%s\" }' % (cid, text))
+    _ = run_sparql('insert data { c:%s r:cby u:%s }' % (cid, uid))
+    _ = run_sparql('insert data { c:%s r:cto w:%s }' % (cid, wid))
+    _ = run_sparql('insert data { c:%s ca:time \"%s\" }' % (cid, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+    weibo_update_int(wid, 'commentsnum', 1)
+    return cid
+
+def delete_reply(cid):
+    wid = query('select ?wid where { c:%s r:cto ?wid }' % (cid))[0]['wid']['value'][w_len:]
+    weibo_update_int(wid, 'commentsnum', -1)
+    _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = c:%s && ?y = ca:time ) )  }' % (cid))
 
 
-# others
 
-def delete_weibo(wid):
-    uid = weibo_uid(wid)
-    user_update_int(uid, 'statusesnum', -1)
-    _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = w:%s || ?z = w:%s ) }' % (wid, wid))
+
+# for test
 
 def bunch_register(n):
     for i in range(n):
@@ -331,4 +398,102 @@ def bunch_follow(n):
     for i in range(n-1):
         follow(str(i+1), str(i+2))
 
+
+
+# some functions for router
+
+def genUserInfo(uid):
+    uid = str(uid)
+    r = user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
+    if r[2] == 'f':
+        gender = '女'
+    elif r[2] == 'm':
+        gender = '男'
+    else:
+        gender = ''
+    infos = {
+        'userID': int(uid),
+        'name': r[0],
+        'location': r[1],
+        'gender': gender,
+        'followersum': int(r[3]),
+        'friendsum': int(r[4]),
+        'statusesum': int(r[5]),
+        'created_at': r[6],
+    }
+    return infos
+
+def genUserInfo2(infos, myuid):
+    myuid = str(myuid)
+    uid = str(infos['userID'])
+    infos['following'] = is_following(myuid, uid)
+    infos['ismyself'] = (myuid == uid)
+    return infos
+
+def genUserInfoEdit(uid):
+    uid = str(uid)
+    r = user_query_values(uid, ['screen_name', 'email', 'url', 'location', 'gender'])
+    if r[4] == 'f':
+        gender = '女'
+    elif r[2] == 'm':
+        gender = '男'
+    else:
+        gender = ''
+    infos = {
+        'name': r[0],
+        'email': r[1],
+        'url': r[2],
+        'location': r[3],
+        'gender': gender,
+    }
+    return infos
+
+def genReply(c, myuid):
+    myuid = str(myuid)
+    myself = (c[1] == myuid)
+    # replyID, userID, username, text, time, myself
+    return Reply(int(c[0]), int(c[1]), c[2], c[3], c[4], myself)
+
+def genWeibo(wid, myuid):
+    wid = str(wid)
+    myuid = str(myuid)
+    uid = weibo_uid(wid)
+    username = user_query_value(uid, 'screen_name')
+    r = weibo_query_values(wid, ['text', 'date', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'])
+    userID = int(uid)
+    text = r[0]
+    topic = r[5]
+    if topic != '':
+        topic = '#' + topic + '#' + ' '
+
+    rlist = repost_list(wid)
+    if len(rlist) > 0:
+        rlist = [(userID, username, topic, text)] + rlist
+        userID, username, topic, text = rlist[-1]
+        rlist = rlist[:-1]
+    rshow = ''
+    for rr in rlist:
+        rshow += rr[1] + '：' + rr[2] + rr[3] + ' // '
+    replies = [genReply(c, myuid) for c in weibo_reply(wid)]
+
+    # (self, userID, postID, username, text, time, repostsum, commentsum, attitudesum, topic, forwardlist, forwardshow, replies)
+    # weibo2 = Weibo(2, 4, '@test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '#天气#', [(1, 'test2','#感想#', '不错'),
+    # (1, '@test3','#感想#', '不错'), (1, '@test4','#感想#', '不错')], 'test2：#感想# 不错 // @test3：#感想# 不错 // @test4：#感想# 不错 // ', [])
+    wb = Weibo(userID, int(wid), username, text, r[1], int(r[2]), int(r[3]), int(r[4]), topic, rlist, rshow, replies)
+    wb.myself = (myuid == uid)
+    wb.praised = is_liked_by(wid, myuid)
+    return wb
+
+def genTopicText(text):
+    if len(text) == 0:
+        return '', ''
+    topic = ''
+    if text[0] == '#':
+        pos = text.find('#', 1)
+        if pos > 0:
+            topic = text[1:pos]
+            text = text[pos+1:]
+    while text.startswith(' '):
+        text = text[1:]
+    return topic, text
 
