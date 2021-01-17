@@ -64,7 +64,24 @@ def user_query_value(uid, k):
     return user_query(uid, k)[0]['x']['value']
 
 def user_query_values(uid, keys):
-    return [user_query_value(uid, k) for k in keys]
+    sel = ''
+    qs = []
+    for k in keys:
+        sel += '?%s ' % (k)
+        qs.append('u:%s ua:%s ?%s' % (uid, k, k))
+    q = ' . '.join(qs)
+    data = query('select ' + sel + 'where { ' + q + ' }')[0]
+    return [data[k]['value'] for k in keys]
+
+def user_query_values_filter(fil, keys):
+    sel = '?uid '
+    qs = []
+    for k in keys:
+        sel += '?%s ' % (k)
+        qs.append('?uid ua:%s ?%s' % (k, k))
+    q = ' . '.join(qs)
+    data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' }')
+    return [[d['uid']['value'][u_len:]] + [d[k]['value'] for k in keys] for d in data]
 
 def user_insert_strings(uid, kv_dict):
     for k,v in kv_dict.items():
@@ -89,11 +106,14 @@ def user_update_int(uid, k, delta):
 # weibo queries
 
 def weibo_query_values(wid, keys):
-    ans = []
+    sel = ''
+    qs = []
     for k in keys:
-        result = query('select ?x where { w:%s wa:%s ?x }' % (wid, k))[0]['x']['value']
-        ans.append(result)
-    return ans
+        sel += '?%s ' % (k)
+        qs.append('w:%s wa:%s ?%s' % (wid, k, k))
+    q = ' . '.join(qs)
+    data = query('select ' + sel + 'where { ' + q + ' }')[0]
+    return [data[k]['value'] for k in keys]
 
 def weibo_insert_ints(wid, kv_dict):
     for k,v in kv_dict.items():
@@ -140,7 +160,7 @@ def login(email, password):
         uid = uids[0]['uid']['value'][u_len:]
         return (True, uid)
 
-def update_info0(uid, email, screen_name, location, url, gender):
+def update_info_old(uid, email, screen_name, location, url, gender):
     email, screen_name, location, url, gender = handle_bad([email, screen_name, location, url, gender])
     cur_email, cur_screen_name = user_query_values(uid, ['email', 'screen_name'])
     if not email == cur_email and not is_unique('email', email):
@@ -186,7 +206,7 @@ def weibo_info(wid):
 
 def latest_weibo(uid):
     ans = []
-    wid_urls = query('select distinct ?wid ?d where { { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } union { ?wid r:by u:%s . ?wid wa:date ?d } } order by desc(?d)' % (uid, uid))
+    wid_urls = query('select distinct ?wid ?d where { { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } union { ?wid r:by u:%s . ?wid wa:date ?d } } order by desc(?d) limit 100' % (uid, uid))
     for url in wid_urls:
         wid = url['wid']['value'][w_len:]
         ans.append(weibo_info(wid))
@@ -194,7 +214,7 @@ def latest_weibo(uid):
 
 def all_weibo():
     ans = []
-    wid_urls = query('select ?wid ?d where { ?wid wa:date ?d } order by desc(?d)')
+    wid_urls = query('select ?wid ?d where { ?wid wa:date ?d } order by desc(?d) limit 100')
     for url in wid_urls:
         wid = url['wid']['value'][w_len:]
         ans.append(weibo_info(wid))
@@ -270,15 +290,6 @@ def find_user(screen_name):
     else:
         return (True, uid_urls[0]['uid']['value'][u_len:])
 
-def find_users(searching):
-    keywords = searching.split(' ')
-    filters = ''
-    for w in keywords:
-        if w != '':
-            filters += 'filter regex(?x, \"%s\" ) ' % (w)
-    uid_urls = query('select ?uid where { ?uid ua:screen_name ?x %s}' % (filters))
-    return [url['uid']['value'][u_len:] for url in uid_urls]
-
 def followers(uid):
     uid_urls = query('select ?uid where { ?uid r:follow u:%s }' % (uid))
     return [url['uid']['value'][u_len:] for url in uid_urls]
@@ -299,9 +310,6 @@ def unfollow(uid1, uid2):
 
 def is_following(uid1, uid2):
     return len(query('select ?r where { u:%s ?r u:%s filter( ?r = r:follow ) }' % (uid1, uid2))) != 0
-
-def is_following_list(uid1, uid2s):
-    return [is_following(uid1, uid2) for uid2 in uid2s]
 
 def routes(uid1, uid2, cnt):
     q = 'select'
@@ -413,9 +421,7 @@ def bunch_follow(n):
 
 # some functions for router
 
-def genUserInfo(uid):
-    uid = str(uid)
-    r = user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
+def genUserInfoFromR(uid, r):
     if r[2] == 'f':
         gender = '女'
     elif r[2] == 'm':
@@ -434,12 +440,39 @@ def genUserInfo(uid):
     }
     return infos
 
-def genUserInfo2(infos, myuid):
+def genUserInfo(uid):
+    uid = str(uid)
+    r = user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
+    return genUserInfoFromR(uid, r)
+
+# user_query_values_filter
+#     data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' }')
+def genUserInfoFilter(fil, myuid):
     myuid = str(myuid)
-    uid = str(infos['userID'])
-    infos['following'] = is_following(myuid, uid)
-    infos['ismyself'] = (myuid == uid)
-    return infos
+    myfollows = set(followings(myuid))
+    rs = user_query_values_filter(fil, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at'])
+    all_infos = []
+    for r in rs:
+        uid = r[0]
+        infos = genUserInfoFromR(uid, r[1:])
+        infos['following'] = (uid in myfollows)
+        infos['ismyself'] = (uid == myuid)
+        all_infos.append(infos)
+    return all_infos
+
+def genSearch(searching, myuid):
+    keywords = searching.split(' ')
+    filters = ''
+    for w in keywords:
+        if w != '':
+            filters += 'filter regex(?screen_name, \"%s\" ) ' % (w)
+    return genUserInfoFilter(filters, myuid)
+
+def genFollowings(uid, myuid):
+    return genUserInfoFilter('. u:%s r:follow ?uid' % (str(uid)), myuid)
+
+def genFollowers(uid, myuid):
+    return genUserInfoFilter('. ?uid r:follow u:%s' % (str(uid)), myuid)
 
 def genUserInfoEdit(uid):
     uid = str(uid)
