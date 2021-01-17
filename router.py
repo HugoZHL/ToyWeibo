@@ -104,7 +104,7 @@ def result_page(searching=""):
     try:
         myUserID = str(request.cookies['userID'])
         username = request.cookies["username"]
-        results = [bc.genUserInfo2(bc.genUserInfo(uid), myUserID) for uid in bc.find_users(searching)]
+        results = bc.genSearch(searching, myUserID)
         return render_template("searchresult.html", username=username, searching=searching, users=results, title='搜索结果')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -125,7 +125,7 @@ def show_following(userID=0):
             myself = (userID == myUserID)
             follow = bc.is_following(str(myUserID), str(userID))
             infos = bc.genUserInfo(userID)
-            followings = [bc.genUserInfo2(bc.genUserInfo(uid), myUserID) for uid in bc.followings(str(userID))]
+            followings = bc.genFollowings(userID, myUserID)
             username = request.cookies['username']
             return render_template("followings.html", username=username, myself=myself, follow=follow, infos=infos, users=followings, title='关注列表')
     except KeyError:
@@ -147,7 +147,7 @@ def show_follower(userID=0):
             myself = (userID == myUserID)
             follow = bc.is_following(str(myUserID), str(userID))
             infos = bc.genUserInfo(userID)
-            followers = [bc.genUserInfo2(bc.genUserInfo(uid), myUserID) for uid in bc.followers(str(userID))]
+            followers = bc.genFollowers(userID, myUserID)
             username = request.cookies['username']
             return render_template("followers.html", username=username, myself=myself, follow=follow, infos=infos, users=followers, title='粉丝列表')
     except KeyError:
