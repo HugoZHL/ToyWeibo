@@ -89,14 +89,24 @@ def user_insert_ints(uid, kv_dict):
     for k,v in kv_dict.items():
         _ = run_sparql('insert data { u:%s ua:%s \"%d\"^^<http://www.w3.org/2001/XMLSchema#integer> }' % (uid, k, v))
 
-def user_delete_values(uid, keys):
-    for k in keys:
-        _ = run_sparql('delete { ?uid ?k ?v } where { ?uid ?k ?v filter( ?uid = u:%s && ?k = ua:%s ) } ' % (uid, k))
+def user_delete_strings(uid, keys):
+    values = user_query_values(uid, keys)
+    for i in range(len(keys)):
+        k = keys[i]
+        v = values[i]
+        _ = run_sparql('delete data { u:%s ua:%s \"%s\" } ' % (uid, k, v))
+
+def user_delete_ints(uid, keys):
+    values = user_query_values(uid, keys)
+    for i in range(len(keys)):
+        k = keys[i]
+        v = values[i]
+        _ = run_sparql('delete data { u:%s ua:%s \"%s\"^^<http://www.w3.org/2001/XMLSchema#integer> } ' % (uid, k, v))
 
 def user_update_int(uid, k, delta):
-    v = int(user_query_value(uid, k)[0])
+    v = int(user_query_value(uid, k))
     v += delta
-    user_delete_values(uid, [k])
+    user_delete_ints(uid, [k])
     user_insert_ints(uid, {k:v})
 
 
@@ -117,14 +127,24 @@ def weibo_insert_ints(wid, kv_dict):
     for k,v in kv_dict.items():
         _ = run_sparql('insert data { w:%s wa:%s \"%d\"^^<http://www.w3.org/2001/XMLSchema#integer> }' % (wid, k, v))
 
-def weibo_delete_values(wid, keys):
-    for k in keys:
-        _ = run_sparql('delete { ?wid ?k ?v } where { ?wid ?k ?v filter( ?wid = w:%s && ?k = wa:%s ) } ' % (wid, k))
+def weibo_delete_strings(wid, keys):
+    values = weibo_query_values(wid, keys)
+    for i in range(len(keys)):
+        k = keys[i]
+        v = values[i]
+        _ = run_sparql('delete data { w:%s wa:%s \"%s\" } ' % (wid, k, v))
+
+def weibo_delete_ints(wid, keys):
+    values = weibo_query_values(wid, keys)
+    for i in range(len(keys)):
+        k = keys[i]
+        v = values[i]
+        _ = run_sparql('delete data { w:%s wa:%s \"%s\"^^<http://www.w3.org/2001/XMLSchema#integer> } ' % (wid, k, v))
 
 def weibo_update_int(wid, k, delta):
     v = int(weibo_query_values(wid, [k])[0])
     v += delta
-    weibo_delete_values(wid, [k])
+    weibo_delete_ints(wid, [k])
     weibo_insert_ints(wid, {k:v})
 
 
@@ -137,9 +157,9 @@ def handle_bad(ls):
 def register(email, screen_name, password, photo):
     email, screen_name, password, photo = handle_bad([email, screen_name, password, photo])
     if not is_unique('email', email):
-        return (False, 'Email already exists')
+        return (False, '该邮箱已被注册')
     if not is_unique('screen_name', screen_name):
-        return (False, 'Screen name already exists')
+        return (False, '该昵称已被注册')
     uid = query('select ?uid where { u:next r:is ?uid }')[0]['uid']['value']
     next_uid = str(int(uid) + 1)
     _ = run_sparql('delete data { u:next r:is \"%s\" }' % (uid))
@@ -154,50 +174,41 @@ def login(email, password):
     email, password = handle_bad([email, password])
     uids = query('select ?uid where { ?uid ua:email \"%s\" . ?uid ua:password \"%s\" }' % (email, password))
     if len(uids) == 0:
-        return (False, 'Wrong email or password')
+        return (False, '邮箱或密码错误')
     else:
         uid = uids[0]['uid']['value'][u_len:]
         return (True, uid)
 
-def update_info_old(uid, email, screen_name, location, url, gender):
-    email, screen_name, location, url, gender = handle_bad([email, screen_name, location, url, gender])
-    cur_email, cur_screen_name = user_query_values(uid, ['email', 'screen_name'])
-    if not email == cur_email and not is_unique('email', email):
-        return (False, 'Email already exists')
-    if not screen_name == cur_screen_name and not is_unique('screen_name', screen_name):
-        return (False, 'Screen name already exists')
-    user_delete_values(uid, ['email', 'screen_name', 'location', 'url', 'gender'])
-    user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'location':location, 'url':url, 'gender':gender})
-    gc.checkpoint(database)
-    return (True, 'Succeeded')
-
-def change_password(uid, old_pwd, new_pwd):
-    old_pwd, new_pwd = handle_bad([old_pwd, new_pwd])
-    if old_pwd != user_query_value(uid, 'password')[0]:
-        return False
-    else:
-        user_delete_values(uid, ['password'])
-        user_insert_strings(uid, {'password': new_pwd})
-        gc.checkpoint(database)
-        return True
+# def change_password(uid, old_pwd, new_pwd):
+#     old_pwd, new_pwd = handle_bad([old_pwd, new_pwd])
+#     if old_pwd != user_query_value(uid, 'password')[0]:
+#         return False
+#     else:
+#         user_delete_values(uid, ['password'])
+#         user_insert_strings(uid, {'password': new_pwd})
+#         gc.checkpoint(database)
+#         return True
 
 def update_info(uid, email, screen_name, password, location, gender, photo):
     email, screen_name, password, location, gender, photo = handle_bad([email, screen_name, password, location, gender, photo])
     cur_email, cur_screen_name = user_query_values(uid, ['email', 'screen_name'])
     if not email == cur_email and not is_unique('email', email):
-        return (False, 'Email already exists')
+        return (False, '该邮箱已被注册')
     if not screen_name == cur_screen_name and not is_unique('screen_name', screen_name):
-        return (False, 'Screen name already exists')
-    user_delete_values(uid, ['email', 'screen_name', 'password', 'location', 'gender', 'photo'])
+        return (False, '该昵称已被注册')
+    user_delete_strings(uid, ['email', 'screen_name', 'password', 'location', 'gender', 'photo'])
     user_insert_strings(uid, {'email':email, 'screen_name':screen_name, 'password':password, 'location':location, 'gender':gender, 'photo':photo})
     gc.checkpoint(database)
-    return (True, 'Succeeded')
+    return (True, '修改成功')
 
 
 # weibo management
 
 def weibo_exists(wid):
     return len(query('select ?d where { w:%s wa:date ?d }' % (wid))) != 0
+
+def weibo_valid(wid):
+    return len(query('select ?d where { w:%s wa:repostsnum ?d }' % (wid))) != 0
 
 def weibo_uid(wid):
     return query('select ?uid where { w:%s r:by ?uid }' % (wid))[0]['uid']['value'][u_len:]
@@ -256,9 +267,9 @@ def repost_list(wid):
     wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
     while len(wid2_urls) > 0:
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
-        if not weibo_exists(wid2):
-            break
         # userID, username, topic, text
+        if not weibo_valid(wid2):
+            break
         uid = weibo_uid(wid2)
         screen_name = '@' + user_query_value(uid, 'screen_name')
         topic = ''
@@ -279,7 +290,7 @@ def delete_weibo(wid):
     if len(wid2_urls) > 0:
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
         weibo_update_int(wid2, 'repostsnum', -1)
-    _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = w:%s && ?y = wa:date ) )  }' % (wid))
+    weibo_delete_strings(wid, ['date'])
     gc.checkpoint(database)
 
 
@@ -291,7 +302,7 @@ def delete_weibo(wid):
 def find_user(screen_name):
     uid_urls = query('select ?uid where { ?uid ua:screen_name \"%s\" }' % (screen_name))
     if len(uid_urls) == 0:
-        return (False, 'User not exist')
+        return (False, '该用户不存在')
     else:
         return (True, uid_urls[0]['uid']['value'][u_len:])
 
@@ -345,19 +356,19 @@ def routes4(uid1, uid2):
                 ans.append(r)
     return ans
 
-def nhops(uid, n):
-    q = 'select ?x%d where { u:%s' % (n-1, uid)
-    for i in range(n-1):
-        q += ' r:follow ?x%d . ?x%d' % (i, i)
-    q += ' r:follow ?x%d }' % (n-1)
-    data = query(q)
-    return [d['x%d' % (n-1)]['value'][u_len:] for d in data]
-
-def nhops_all(uid, n):
-    ans = set()
-    for i in range(n):
-        ans.update(nhops(uid, i+1))
-    return list(ans)
+# def nhops(uid, n):
+#     q = 'select ?x%d where { u:%s' % (n-1, uid)
+#     for i in range(n-1):
+#         q += ' r:follow ?x%d . ?x%d' % (i, i)
+#     q += ' r:follow ?x%d }' % (n-1)
+#     data = query(q)
+#     return [d['x%d' % (n-1)]['value'][u_len:] for d in data]
+#
+# def nhops_all(uid, n):
+#     ans = set()
+#     for i in range(n):
+#         ans.update(nhops(uid, i+1))
+#     return list(ans)
 
 
 
@@ -410,7 +421,8 @@ def send_reply(wid, uid, text):
 def delete_reply(cid):
     wid = query('select ?wid where { c:%s r:cto ?wid }' % (cid))[0]['wid']['value'][w_len:]
     weibo_update_int(wid, 'commentsnum', -1)
-    _ = run_sparql('delete { ?x ?y ?z } where { ?x ?y ?z filter( ?x = c:%s && ?y = ca:time ) )  }' % (cid))
+    t = query('select ?t where { c:%s ca:time ?t }' % (cid))[0]['t']['value']
+    _ = run_sparql('delete data { c:%s ca:time \"%s\" }' % (cid, t))
     gc.checkpoint(database)
 
 
@@ -418,14 +430,14 @@ def delete_reply(cid):
 
 # for test
 
-def bunch_register(n):
-    for i in range(n):
-        x = str(i+1)
-        register(x,x,x,'','','')
-
-def bunch_follow(n):
-    for i in range(n-1):
-        follow(str(i+1), str(i+2))
+# def bunch_register(n):
+#     for i in range(n):
+#         x = str(i+1)
+#         register(x,x,x,'','','')
+#
+# def bunch_follow(n):
+#     for i in range(n-1):
+#         follow(str(i+1), str(i+2))
 
 
 

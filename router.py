@@ -30,7 +30,7 @@ def register():
         pwd = request.form['password']
         if pwd != request.form['rpassword']:
             ok = False
-            info = 'Password inconsistent'
+            info = '密码不一致'
         else:
             ok, info = bc.register(request.form['email'], request.form['username'], pwd, request.form['img_idx'])
         if ok:
@@ -71,7 +71,7 @@ def edit_profile():
             pwd = request.form['password']
             if pwd != request.form['rpassword']:
                 ok = False
-                info = 'Password inconsistent'
+                info = '密码不一致'
             else:
                 g = request.form['gender']
                 if g == '女':
@@ -200,7 +200,7 @@ def adsearch():
             ok1, uid1 = bc.find_user(request.form['user1'])
             ok2, uid2 = bc.find_user(request.form['user2'])
             if not ok1 or not ok2:
-                return render_template("adsearch.html", error='User not exist')
+                return render_template("adsearch.html", error='用户不存在')
             result = bc.routes4(uid1, uid2)
             infos = {}
             info_keys = set()
