@@ -48,12 +48,13 @@ def show_profile(userID=0):
         if request.method == 'POST':
             searching = request.form['searching']
             return redirect('/searchresult/%s' % searching)
-        if userID == 0: userID = int(request.cookies['userID'])
+        if userID == 0:
+            userID = int(request.cookies['userID'])
         myuid = request.cookies['userID']
         myself = (userID == int(myuid))
         follow = bc.is_following(str(myuid), str(userID))
         infos = bc.genUserInfo(userID)
-        posts = [bc.genWeibo(wid, myuid) for wid in bc.user_weibo(str(userID))]
+        posts = bc.user_weibos(userID, myuid)
         username = request.cookies['username']
         return render_template("profile.html", username=username, myself=myself, follow=follow, infos=infos, posts=posts, title='个人主页')
     except KeyError:
@@ -164,7 +165,7 @@ def square():
         else:
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
-            posts = [bc.genWeibo(wid, userID) for wid in bc.latest_weibo(str(userID))]
+            posts = bc.latest_weibos(userID)
             return render_template("square.html", username=username, posts=posts, title='广场大厅')
     except KeyError:
         print(KeyError, " keyerror for username")
@@ -180,7 +181,7 @@ def recommends():
         else:
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
-            posts = [bc.genWeibo(wid, userID) for wid in bc.all_weibo()]
+            posts = bc.all_weibos(userID)
             return render_template("recommends.html", username=username, posts=posts, title='热点推荐')
     except KeyError:
         print(KeyError, " keyerror for username")

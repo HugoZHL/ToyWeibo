@@ -71,14 +71,14 @@ def user_query_values(uid, keys):
     data = query('select ' + sel + 'where { ' + q + ' }')[0]
     return [data[k]['value'] for k in keys]
 
-def user_query_values_filter(fil, keys):
+def user_query_values_filter(fil, keys, limits):
     sel = '?uid '
     qs = []
     for k in keys:
         sel += '?%s ' % (k)
         qs.append('?uid ua:%s ?%s' % (k, k))
     q = ' . '.join(qs)
-    data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' }')
+    data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' } ' + limits)
     return [[d['uid']['value'][u_len:]] + [d[k]['value'] for k in keys] for d in data]
 
 def user_insert_strings(uid, kv_dict):
@@ -112,6 +112,12 @@ def user_update_int(uid, k, delta):
 
 
 # weibo queries
+
+def weibo_query(wid, k):
+    return query('select ?x where { w:%s wa:%s ?x }' % (wid, k))
+
+def weibo_query_value(wid, k):
+    return weibo_query(wid, k)[0]['x']['value']
 
 def weibo_query_values(wid, keys):
     sel = ''
@@ -212,34 +218,6 @@ def weibo_valid(wid):
 
 def weibo_uid(wid):
     return query('select ?uid where { w:%s r:by ?uid }' % (wid))[0]['uid']['value'][u_len:]
-
-def weibo_info(wid):
-    #return [wid, weibo_uid(wid)] + weibo_query_values(wid, ['text', 'date', 'attitudesnum'])
-    return wid
-
-def latest_weibo(uid):
-    ans = []
-    wid_urls = query('select distinct ?wid ?d where { { ?wid r:by ?x . u:%s r:follow ?x . ?wid wa:date ?d } union { ?wid r:by u:%s . ?wid wa:date ?d } } order by desc(?d) limit 50' % (uid, uid))
-    for url in wid_urls:
-        wid = url['wid']['value'][w_len:]
-        ans.append(weibo_info(wid))
-    return ans
-
-def all_weibo():
-    ans = []
-    wid_urls = query('select ?wid ?d where { ?wid wa:date ?d } order by desc(?d) limit 50')
-    for url in wid_urls:
-        wid = url['wid']['value'][w_len:]
-        ans.append(weibo_info(wid))
-    return ans
-
-def user_weibo(uid):
-    ans = []
-    wid_urls = query('select ?wid ?d where { ?wid r:by u:%s . ?wid wa:date ?d } order by desc(?d)' % (uid))
-    for url in wid_urls:
-        wid = url['wid']['value'][w_len:]
-        ans.append(weibo_info(wid))
-    return ans
     
 def send_weibo(uid, text, topic):
     text, topic = handle_bad([text, topic])
@@ -375,7 +353,7 @@ def routes4(uid1, uid2):
 # like
 
 def is_liked_by(wid, uid):
-    return len(query('select ?r where { w:%s ?r u:%s filter( ?r = r:likedby ) }' % (wid, uid))) != 0
+    return len(query('select ?uid where { w:%s r:likedby ?uid filter( ?uid = u:%s ) }' % (wid, uid))) != 0
 
 def like_it(wid, uid):
     _ = run_sparql('insert data { w:%s r:likedby u:%s }' % (wid, uid))
@@ -441,7 +419,7 @@ def delete_reply(cid):
 
 
 
-# some functions for router
+# some functions for userInfo
 
 def genUserInfoFromR(uid, r):
     if r[2] == 'f':
@@ -468,12 +446,11 @@ def genUserInfo(uid):
     r = user_query_values(uid, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at', 'photo'])
     return genUserInfoFromR(uid, r)
 
-# user_query_values_filter
-#     data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' }')
-def genUserInfoFilter(fil, myuid):
+# data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' }')
+def genUserInfoFilter(fil, myuid, limits):
     myuid = str(myuid)
     myfollows = set(followings(myuid))
-    rs = user_query_values_filter(fil, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at', 'photo'])
+    rs = user_query_values_filter(fil, ['screen_name', 'location', 'gender', 'followersnum', 'friendsnum', 'statusesnum', 'created_at', 'photo'], limits)
     all_infos = []
     for r in rs:
         uid = r[0]
@@ -489,13 +466,13 @@ def genSearch(searching, myuid):
     for w in keywords:
         if w != '':
             filters += 'filter regex(?screen_name, \"%s\" ) ' % (w)
-    return genUserInfoFilter(filters, myuid)
+    return genUserInfoFilter(filters, myuid, 'limit 1000')
 
 def genFollowings(uid, myuid):
-    return genUserInfoFilter('. u:%s r:follow ?uid' % (str(uid)), myuid)
+    return genUserInfoFilter('. u:%s r:follow ?uid' % (str(uid)), myuid, '')
 
 def genFollowers(uid, myuid):
-    return genUserInfoFilter('. ?uid r:follow u:%s' % (str(uid)), myuid)
+    return genUserInfoFilter('. ?uid r:follow u:%s' % (str(uid)), myuid, '')
 
 def genUserInfoEdit(uid):
     uid = str(uid)
@@ -521,35 +498,71 @@ def genReply(c, myuid):
     # replyID, userID, username, text, time, myself
     return Reply(int(c[0]), int(c[1]), c[2], c[3], c[4], myself, c[5])
 
-def genWeibo(wid, myuid):
-    wid = str(wid)
+
+
+# some functions for Weibo Info
+
+def weibo_info(fil, keys, limits):
+    sel = '?wid ?d ?uid ?username ?photo '
+    qs = ['?wid wa:date ?d', '?wid r:by ?uid', '?uid ua:screen_name ?username', '?uid ua:photo ?photo']
+    for k in keys:
+        sel += '?%s ' % (k)
+        qs.append('?wid wa:%s ?%s' % (k, k))
+    q = ' . '.join(qs)
+    data = query('select ' + sel + 'where { ' + q + ' ' + fil + ' } order by desc(?d) ' + limits)
+    # wid, uid, username, photo, date, ...
+    return [[d['wid']['value'][w_len:], d['uid']['value'][u_len:], d['username']['value'], d['photo']['value'], d['d']['value']] +
+            [d[k]['value'] for k in keys] for d in data]
+
+def weibo_filter(fil, limits):
+    wid_urls = query('select distinct ?wid ?d where { ?wid wa:date ?d . ' + fil + ' } order by desc(?d) ' + limits)
+    return [url['wid']['value'][w_len:] for url in wid_urls]
+
+def genWeibosFilter(fil, myuid, limits):
     myuid = str(myuid)
-    uid = weibo_uid(wid)
-    username, img_idx = user_query_values(uid, ['screen_name', 'photo'])
-    r = weibo_query_values(wid, ['text', 'date', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'])
-    userID = int(uid)
-    text = r[0]
-    topic = r[5]
-    if topic != '':
-        topic = '#' + topic + '#' + ' '
+    # wid, uid, username, photo, date, text, repostsnum, commentsnum, attitudesnum, topic
+    # 0    1    2         3      4     5     6           7            8             9
+    rs = weibo_info(fil, ['text', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'], limits)
+    wid_r = set(weibo_filter('?wid r:repost ?wid2 ' + fil, limits))
+    wid_c = set(weibo_filter('?cid r:cto ?wid ' + fil, limits))
+    weibos = []
+    for wid, uid, username, photo, d, text, repostsnum, commentsnum, attitudesnum, topic in rs:
+        userID = int(uid)
+        if topic != '':
+            topic = '#' + topic + '#' + ' '
+        rlist = []
+        if wid in wid_r:
+            rlist = repost_list(wid)
+            if len(rlist) > 0:
+                rlist = [(userID, username, topic, text)] + rlist
+                userID, username, topic, text = rlist[-1]
+                rlist = rlist[:-1]
+        rshow = ''
+        for rr in rlist:
+            rshow += rr[1] + '：' + rr[2] + rr[3] + ' // '
+        replies = []
+        if wid in wid_c:
+            replies = [genReply(c, myuid) for c in weibo_reply(wid)]
+        # (self, userID, postID, username, text, time, repostsum, commentsum, attitudesum, topic, forwardlist, forwardshow, img_idx, replies)
+        # weibo2 = Weibo(2, 2, 'test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '#天气#', [], '', '14', [
+        #         Reply(13, 4, 'test4', 'bad', '2020年1月1日13:48', False, '7'),
+        #         Reply(14, 5, 'test5', 'not bad', '2020年1月1日13:49', True, '8'),
+        #         ])
+        wb = Weibo(userID, int(wid), username, text, d, int(repostsnum), int(commentsnum), int(attitudesnum), topic, rlist, rshow, photo, replies)
+        wb.myself = (myuid == uid)
+        wb.praised = is_liked_by(wid, myuid)
+        weibos.append(wb)
+    return weibos
 
-    rlist = repost_list(wid)
-    if len(rlist) > 0:
-        rlist = [(userID, username, topic, text)] + rlist
-        userID, username, topic, text = rlist[-1]
-        rlist = rlist[:-1]
-    rshow = ''
-    for rr in rlist:
-        rshow += rr[1] + '：' + rr[2] + rr[3] + ' // '
-    replies = [genReply(c, myuid) for c in weibo_reply(wid)]
+def latest_weibos(myuid):
+    myuid = str(myuid)
+    return genWeibosFilter('. { { u:%s r:follow ?uid } union { ?wid r:by u:%s } }' % (myuid, myuid), myuid, 'limit 100')
 
-    # (self, userID, postID, username, text, time, repostsum, commentsum, attitudesum, topic, forwardlist, forwardshow, img_idx, replies)
-    # weibo2 = Weibo(2, 4, '@test3', '今天天气真差', '2020年1月1日13:47', 5, 6, 7, '#天气#', [(1, 'test2','#感想#', '不错'),
-    # (1, '@test3','#感想#', '不错'), (1, '@test4','#感想#', '不错')], 'test2：#感想# 不错 // @test3：#感想# 不错 // @test4：#感想# 不错 // ', [])
-    wb = Weibo(userID, int(wid), username, text, r[1], int(r[2]), int(r[3]), int(r[4]), topic, rlist, rshow, img_idx, replies)
-    wb.myself = (myuid == uid)
-    wb.praised = is_liked_by(wid, myuid)
-    return wb
+def all_weibos(myuid):
+    return genWeibosFilter('', myuid, 'limit 100')
+
+def user_weibos(uid, myuid):
+    return genWeibosFilter('. ?wid r:by u:%s' % (uid), myuid, '')
 
 def genTopicText(text):
     if len(text) == 0:
