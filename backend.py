@@ -129,6 +129,10 @@ def weibo_query_values(wid, keys):
     data = query('select ' + sel + 'where { ' + q + ' }')[0]
     return [data[k]['value'] for k in keys]
 
+def weibo_insert_strings(wid, kv_dict):
+    for k,v in kv_dict.items():
+        _ = run_sparql('insert data { w:%s wa:%s \"%s\" }' % (wid, k, v))
+
 def weibo_insert_ints(wid, kv_dict):
     for k,v in kv_dict.items():
         _ = run_sparql('insert data { w:%s wa:%s \"%d\"^^<http://www.w3.org/2001/XMLSchema#integer> }' % (wid, k, v))
@@ -246,16 +250,15 @@ def repost_list(wid):
     while len(wid2_urls) > 0:
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
         # userID, username, topic, text
-        if not weibo_valid(wid2):
+        data = query('select ?uid ?username ?topic ?text where { w:%s r:by ?uid . ?uid ua:screen_name ?username . w:%s wa:topic ?topic . w:%s wa:text ?text }' % (wid2, wid2, wid2))
+        if len(data) == 0:
             break
-        uid = weibo_uid(wid2)
-        screen_name = '@' + user_query_value(uid, 'screen_name')
-        topic = ''
-        text = '此微博已删除'
-        if weibo_exists(wid2):
-            topic, text = weibo_query_values(wid2, ['topic', 'text'])
-            if topic != '':
-                topic = '#' + topic + '#' + ' '
+        uid = data[0]['uid']['value'][u_len:]
+        screen_name = '@' + data[0]['username']['value']
+        topic = data[0]['topic']['value']
+        text = data[0]['text']['value']
+        if topic != '':
+            topic = '#' + topic + '#' + ' '
         ans.append((int(uid), screen_name, topic, text))
         wid1 = wid2
         wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
@@ -268,7 +271,8 @@ def delete_weibo(wid):
     if len(wid2_urls) > 0:
         wid2 = wid2_urls[0]['wid']['value'][w_len:]
         weibo_update_int(wid2, 'repostsnum', -1)
-    weibo_delete_strings(wid, ['date'])
+    weibo_delete_strings(wid, ['date', 'topic', 'text'])
+    weibo_insert_strings(wid, {'topic':'', 'text':'此微博已删除'})
     gc.checkpoint(database)
 
 
@@ -503,8 +507,12 @@ def genReply(c, myuid):
 # some functions for Weibo Info
 
 def weibo_info(fil, keys, limits):
+    data0 = query('select ?wid ?d where { ?wid wa:date ?d ' + fil + ' } order by desc(?d) ' + limits)
+    if len(data0) == 0:
+        return []
+    mind = data0[-1]['d']['value']
     sel = '?wid ?d ?uid ?username ?photo '
-    qs = ['?wid wa:date ?d', '?wid r:by ?uid', '?uid ua:screen_name ?username', '?uid ua:photo ?photo']
+    qs = ['?wid wa:date ?d filter ( ?d >= \"%s\" )' % (mind), '?wid r:by ?uid', '?uid ua:screen_name ?username', '?uid ua:photo ?photo']
     for k in keys:
         sel += '?%s ' % (k)
         qs.append('?wid wa:%s ?%s' % (k, k))
@@ -523,7 +531,7 @@ def genWeibosFilter(fil, myuid, limits):
     # wid, uid, username, photo, date, text, repostsnum, commentsnum, attitudesnum, topic
     # 0    1    2         3      4     5     6           7            8             9
     rs = weibo_info(fil, ['text', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'], limits)
-    wid_r = set(weibo_filter('?wid r:repost ?wid2 ' + fil, limits))
+    wid_r = set(weibo_filter('?wid r:repost ?wid2 . ?wid2 wa:repostsnum ?x ' + fil, limits))
     wid_c = set(weibo_filter('?cid r:cto ?wid ' + fil, limits))
     weibos = []
     for wid, uid, username, photo, d, text, repostsnum, commentsnum, attitudesnum, topic in rs:
@@ -556,10 +564,10 @@ def genWeibosFilter(fil, myuid, limits):
 
 def latest_weibos(myuid):
     myuid = str(myuid)
-    return genWeibosFilter('. { { u:%s r:follow ?uid } union { ?wid r:by u:%s } }' % (myuid, myuid), myuid, 'limit 100')
+    return genWeibosFilter('. { { ?wid r:by ?uid . u:%s r:follow ?uid } union { ?wid r:by u:%s } }' % (myuid, myuid), myuid, 'limit 50')
 
 def all_weibos(myuid):
-    return genWeibosFilter('', myuid, 'limit 100')
+    return genWeibosFilter('', myuid, 'limit 50')
 
 def user_weibos(uid, myuid):
     return genWeibosFilter('. ?wid r:by u:%s' % (uid), myuid, '')
