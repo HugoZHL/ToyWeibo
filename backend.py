@@ -298,7 +298,7 @@ def routes(uid1, uid2, cnt):
         q += ' ?x%d' % (i)
     q += ' where { u:%s' % (uid1)
     for i in range(cnt):
-        q += ' r:follow ?x%d . ?x%d' % (i, i)
+        q += ' r:follow ?x%d filter( ?x%d != u:%s && ?x%d != u:%s ) . ?x%d' % (i, i, uid1, i, uid2, i)
     q += ' r:follow u:%s } limit 50' % (uid2)
     data = query(q)
     ans = []
@@ -315,10 +315,7 @@ def routes4(uid1, uid2):
     if is_following(uid1, uid2):
         ans.append([uid1, uid2])
     for i in range(3):
-        result = routes(uid1, uid2, i+1)
-        for r in result:
-            if len(set(r)) == len(r):
-                ans.append(r)
+        ans += routes(uid1, uid2, i+1)
     return ans
 
 # def nhops(uid, n):
