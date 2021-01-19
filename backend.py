@@ -299,7 +299,7 @@ def routes(uid1, uid2, cnt):
     q += ' where { u:%s' % (uid1)
     for i in range(cnt):
         q += ' r:follow ?x%d . ?x%d' % (i, i)
-    q += ' r:follow u:%s }' % (uid2)
+    q += ' r:follow u:%s } limit 50' % (uid2)
     data = query(q)
     ans = []
     for d in data:
