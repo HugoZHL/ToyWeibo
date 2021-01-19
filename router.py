@@ -1,5 +1,6 @@
 from flask import *
 import backend as bc
+import urllib
 
 app = Flask(__name__)
 
@@ -47,7 +48,7 @@ def show_profile(userID=0):
     try:
         if request.method == 'POST':
             searching = request.form['searching']
-            return redirect('/searchresult/%s' % searching)
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
         if userID == 0:
             userID = int(request.cookies['userID'])
         myuid = request.cookies['userID']
@@ -99,9 +100,9 @@ def edit_profile():
 @app.route("/searchresult/", methods=['POST', 'GET'])
 @app.route("/searchresult/<string:searching>", methods=['POST', 'GET'])
 def result_page(searching=""):
-    if not searching or request.method=='POST':
+    if request.method=='POST':
         searching = request.form['searching']
-        return redirect('/searchresult/%s' % searching)
+        return redirect('/searchresult/%s' % urllib.parse.quote(searching))
     try:
         myUserID = str(request.cookies['userID'])
         username = request.cookies["username"]
@@ -118,7 +119,7 @@ def show_following(userID=0):
     try:
         if request.method == 'POST':
             searching = request.form['searching']
-            return redirect('/searchresult/%s' % searching)
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
         else:
             myUserID = int(request.cookies['userID'])
             if userID == 0:
@@ -140,7 +141,7 @@ def show_follower(userID=0):
     try:
         if request.method == 'POST':
             searching = request.form['searching']
-            return redirect('/searchresult/%s' % searching)
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
         else:
             myUserID = int(request.cookies['userID'])
             if userID == 0:
@@ -161,7 +162,7 @@ def square():
     try:
         if request.method == 'POST':
             searching = request.form['searching']
-            return redirect('/searchresult/%s' % searching)
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
         else:
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
@@ -177,7 +178,7 @@ def recommends():
     try:
         if request.method == 'POST':
             searching = request.form['searching']
-            return redirect('/searchresult/%s' % searching)
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
         else:
             userID = int(request.cookies['userID'])
             username = request.cookies["username"]
@@ -192,7 +193,7 @@ def recommends():
 def adsearch():
     if request.method == 'POST' and 'searching' in request.form:
         searching = request.form['searching']
-        return redirect('/searchresult/%s' % searching)
+        return redirect('/searchresult/%s' % urllib.parse.quote(searching))
     error = None
     try:
         userID = int(request.cookies["userID"])

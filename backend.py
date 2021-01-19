@@ -458,6 +458,8 @@ def genSearch(searching, myuid):
     for w in keywords:
         if w != '':
             filters += 'filter regex(?screen_name, \"%s\" ) ' % (handle_bad([w])[0])
+    if not filters:
+        return []
     return genUserInfoFilter(filters, myuid, 'limit 1000')
 
 def genFollowings(uid, myuid):
