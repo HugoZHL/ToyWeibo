@@ -100,10 +100,10 @@ def edit_profile():
 @app.route("/searchresult/", methods=['POST', 'GET'])
 @app.route("/searchresult/<string:searching>", methods=['POST', 'GET'])
 def result_page(searching=""):
-    if request.method=='POST':
-        searching = request.form['searching']
-        return redirect('/searchresult/%s' % urllib.parse.quote(searching))
     try:
+        if not searching or request.method=='POST':
+            searching = request.form['searching']
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
         myUserID = str(request.cookies['userID'])
         username = request.cookies["username"]
         results = bc.genSearch(searching, myUserID)
