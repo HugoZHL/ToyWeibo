@@ -187,7 +187,7 @@ def login(email, password):
     email, password = handle_bad([email, password])
     uids = query('select ?uid where { ?uid ua:email \"%s\" . ?uid ua:password \"%s\" }' % (email, password))
     if len(uids) == 0:
-        return (False, '邮箱或密码错误')
+        return (False, '邮箱或密码错误，请重新输入。')
     else:
         uid = uids[0]['uid']['value'][u_len:]
         return (True, uid)

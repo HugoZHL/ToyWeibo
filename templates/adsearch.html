@@ -34,12 +34,19 @@
                         <i class="fa fa-envelope fa-lg"></i>
                         <input class="form-control" type="text" placeholder="请输入昵称" name="user2" required/>
                     </div>
-                    <div class="form-group">
-                        <button class="btn btn-lg btn-primary btn-block" type="submit">开始搜索！</button>
+                    <div class="col-lg-5 col-md-5 col-sm-5">
+                        <div class="form-group">
+                            <a href="{{ url_for('square') }}" class="btn btn-lg btn-info btn-block" type="button">返回</a>
+                        </div>
+                    </div>
+                    <div class="col-sm-offset-2 col-md-offset-2 col-lg-offset-2 col-lg-5 col-md-5 col-sm-5">
+                        <div class="form-group">
+                            <button class="btn btn-lg btn-primary btn-block" type="submit">开始搜索！</button>
+                        </div>
                     </div>
 
     {% if error != None %}
-    <p><font color="red">{{ error }}</font></p>
+    <p style="color: red;">{{ error }}</p>
     {% endif %}
                 </div>
             </form>
