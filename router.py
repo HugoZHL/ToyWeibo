@@ -16,7 +16,7 @@ def login():
     if request.method == 'POST':
         ok, info = bc.login(request.form['email'], request.form['password'])
         if ok:
-            username = bc.user_query_value(info, 'screen_name')
+            username = bc.getUserName(info)
             resp = make_response(redirect('/square'))
             resp.set_cookie('username', username, max_age=3600)
             resp.set_cookie('userID', info, max_age=3600)

@@ -37,6 +37,12 @@ _ = gc.load(database)
 
 # basic functions
 
+def handle_bad(ls):
+    return [l.replace('\\', '\\\\').replace('\"', '\\\"').replace('\'', '\\\'').replace('\n', '').replace('\r', '') for l in ls]
+
+def handle_bad_r(ls):
+    return [l.replace('\\\"', '\"').replace('\\\'', '\'').replace('\\\\', '\\') for l in ls]
+
 def run_sparql(l):
     ret = gc.query(database, 'json', prefix_string + l)
     return ret
@@ -161,9 +167,6 @@ def weibo_update_int(wid, k, delta):
 
 # user account management
 
-def handle_bad(ls):
-    return [l.replace('\\', '\\\\').replace('\"', '\\\"') for l in ls]
-
 def register(email, screen_name, password, photo):
     email, screen_name, password, photo = handle_bad([email, screen_name, password, photo])
     if not is_unique('email', email):
@@ -243,27 +246,6 @@ def repost_weibo(wid1, wid2):
     weibo_update_int(wid2, 'repostsnum', 1)
     gc.checkpoint(database)
 
-def repost_list(wid):
-    ans = []
-    wid1 = wid
-    wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
-    while len(wid2_urls) > 0:
-        wid2 = wid2_urls[0]['wid']['value'][w_len:]
-        # userID, username, topic, text
-        data = query('select ?uid ?username ?topic ?text where { w:%s r:by ?uid . ?uid ua:screen_name ?username . w:%s wa:topic ?topic . w:%s wa:text ?text }' % (wid2, wid2, wid2))
-        if len(data) == 0:
-            break
-        uid = data[0]['uid']['value'][u_len:]
-        screen_name = '@' + data[0]['username']['value']
-        topic = data[0]['topic']['value']
-        text = data[0]['text']['value']
-        if topic != '':
-            topic = '#' + topic + '#' + ' '
-        ans.append((int(uid), screen_name, topic, text))
-        wid1 = wid2
-        wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
-    return ans
-
 def delete_weibo(wid):
     uid = weibo_uid(wid)
     user_update_int(uid, 'statusesnum', -1)
@@ -282,6 +264,7 @@ def delete_weibo(wid):
 # user relations
 
 def find_user(screen_name):
+    screen_name = handle_bad([screen_name])[0]
     uid_urls = query('select ?uid where { ?uid ua:screen_name \"%s\" }' % (screen_name))
     if len(uid_urls) == 0:
         return (False, '该用户不存在')
@@ -375,12 +358,12 @@ def cancel_like_it(wid, uid):
 
 def weibo_reply(wid):
     ans = []
-    cid_urls = query('select ?cid ?uid ?text ?t ?photo where { ?cid r:cto w:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid . ?uid ua:photo ?photo } order by desc(?t)' % (wid))
+    cid_urls = query('select ?cid ?uid ?username ?text ?t ?photo where { ?cid r:cto w:%s . ?cid ca:time ?t . ?cid ca:text ?text . ?cid r:cby ?uid . ?uid ua:screen_name ?username . ?uid ua:photo ?photo } order by desc(?t)' % (wid))
     for url in cid_urls:
         # replyID, userID, username, text, time, myself
         cid = url['cid']['value'][c_len:]
         uid = url['uid']['value'][u_len:]
-        username = user_query_value(uid, 'screen_name')
+        username = url['username']['value']
         text = url['text']['value']
         t = url['t']['value']
         photo = url['photo']['value']
@@ -388,6 +371,7 @@ def weibo_reply(wid):
     return ans
 
 def send_reply(wid, uid, text):
+    text = handle_bad([text])[0]
     cid = query('select ?cid where { c:next r:is ?cid }')[0]['cid']['value']
     next_cid = str(int(cid) + 1)
     _ = run_sparql('delete data { c:next r:is \"%s\" }' % (cid))
@@ -425,6 +409,9 @@ def delete_reply(cid):
 
 # some functions for userInfo
 
+def getUserName(uid):
+    return handle_bad_r([user_query_value(uid, 'screen_name')])[0]
+
 def genUserInfoFromR(uid, r):
     if r[2] == 'f':
         gender = '女'
@@ -432,10 +419,11 @@ def genUserInfoFromR(uid, r):
         gender = '男'
     else:
         gender = '性别未知或其他'
+    name, location = handle_bad_r([r[0], r[1]])
     infos = {
         'userID': int(uid),
-        'name': r[0],
-        'location': r[1],
+        'name': name,
+        'location': location,
         'gender': gender,
         'followersum': int(r[3]),
         'friendsum': int(r[4]),
@@ -469,7 +457,7 @@ def genSearch(searching, myuid):
     filters = ''
     for w in keywords:
         if w != '':
-            filters += 'filter regex(?screen_name, \"%s\" ) ' % (w)
+            filters += 'filter regex(?screen_name, \"%s\" ) ' % (handle_bad([w])[0])
     return genUserInfoFilter(filters, myuid, 'limit 1000')
 
 def genFollowings(uid, myuid):
@@ -481,6 +469,7 @@ def genFollowers(uid, myuid):
 def genUserInfoEdit(uid):
     uid = str(uid)
     r = user_query_values(uid, ['screen_name', 'email', 'location', 'gender', 'photo'])
+    name, email, location = handle_bad_r([r[0], r[1], r[2]])
     if r[3] == 'f':
         gender = '女'
     elif r[3] == 'm':
@@ -488,9 +477,9 @@ def genUserInfoEdit(uid):
     else:
         gender = ''
     infos = {
-        'name': r[0],
-        'email': r[1],
-        'location': r[2],
+        'name': name,
+        'email': email,
+        'location': location,
         'gender': gender,
         'img_idx': r[4],
     }
@@ -499,8 +488,9 @@ def genUserInfoEdit(uid):
 def genReply(c, myuid):
     myuid = str(myuid)
     myself = (c[1] == myuid)
-    # replyID, userID, username, text, time, myself
-    return Reply(int(c[0]), int(c[1]), c[2], c[3], c[4], myself, c[5])
+    username, text = handle_bad_r([c[2], c[3]])
+    # replyID, userID, username, text, time, myself, photo
+    return Reply(int(c[0]), int(c[1]), username, text, c[4], myself, c[5])
 
 
 
@@ -526,6 +516,28 @@ def weibo_filter(fil, limits):
     wid_urls = query('select distinct ?wid ?d where { ?wid wa:date ?d . ' + fil + ' } order by desc(?d) ' + limits)
     return [url['wid']['value'][w_len:] for url in wid_urls]
 
+def repost_list(wid):
+    ans = []
+    wid1 = wid
+    wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
+    while len(wid2_urls) > 0:
+        wid2 = wid2_urls[0]['wid']['value'][w_len:]
+        # userID, username, topic, text
+        data = query('select ?uid ?username ?topic ?text where { w:%s r:by ?uid . ?uid ua:screen_name ?username . w:%s wa:topic ?topic . w:%s wa:text ?text }' % (wid2, wid2, wid2))
+        if len(data) == 0:
+            break
+        uid = data[0]['uid']['value'][u_len:]
+        screen_name = '@' + data[0]['username']['value']
+        topic = data[0]['topic']['value']
+        text = data[0]['text']['value']
+        if topic != '':
+            topic = '#' + topic + '#' + ' '
+        screen_name, topic, text = handle_bad_r([screen_name, topic, text])
+        ans.append((int(uid), screen_name, topic, text))
+        wid1 = wid2
+        wid2_urls = query('select ?wid where { w:%s r:repost ?wid }' % (wid1))
+    return ans
+
 def genWeibosFilter(fil, myuid, limits):
     myuid = str(myuid)
     # wid, uid, username, photo, date, text, repostsnum, commentsnum, attitudesnum, topic
@@ -533,11 +545,13 @@ def genWeibosFilter(fil, myuid, limits):
     rs = weibo_info(fil, ['text', 'repostsnum', 'commentsnum', 'attitudesnum', 'topic'], limits)
     wid_r = set(weibo_filter('?wid r:repost ?wid2 . ?wid2 wa:repostsnum ?x ' + fil, limits))
     wid_c = set(weibo_filter('?cid r:cto ?wid ' + fil, limits))
+    wid_l = set(weibo_filter('?wid r:likedby u:' + myuid + ' ' + fil, limits))
     weibos = []
     for wid, uid, username, photo, d, text, repostsnum, commentsnum, attitudesnum, topic in rs:
         userID = int(uid)
         if topic != '':
             topic = '#' + topic + '#' + ' '
+        username, text, topic = handle_bad_r([username, text, topic])
         rlist = []
         if wid in wid_r:
             rlist = repost_list(wid)
@@ -558,16 +572,16 @@ def genWeibosFilter(fil, myuid, limits):
         #         ])
         wb = Weibo(userID, int(wid), username, text, d, int(repostsnum), int(commentsnum), int(attitudesnum), topic, rlist, rshow, photo, replies)
         wb.myself = (myuid == uid)
-        wb.praised = is_liked_by(wid, myuid)
+        wb.praised = (wid in wid_l)
         weibos.append(wb)
     return weibos
 
 def latest_weibos(myuid):
     myuid = str(myuid)
-    return genWeibosFilter('. { { ?wid r:by ?uid . u:%s r:follow ?uid } union { ?wid r:by u:%s } }' % (myuid, myuid), myuid, 'limit 50')
+    return genWeibosFilter('. { { ?wid r:by ?uid . u:%s r:follow ?uid } union { ?wid r:by u:%s } }' % (myuid, myuid), myuid, 'limit 100')
 
 def all_weibos(myuid):
-    return genWeibosFilter('', myuid, 'limit 50')
+    return genWeibosFilter('', myuid, 'limit 100')
 
 def user_weibos(uid, myuid):
     return genWeibosFilter('. ?wid r:by u:%s' % (uid), myuid, '')
