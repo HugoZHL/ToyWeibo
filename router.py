@@ -13,33 +13,41 @@ def homepage():
 
 @app.route("/login", methods=['POST', 'GET'])
 def login():
-    info = None
-    if request.method == 'POST':
-        ok, info = bc.login(request.form['email'], request.form['password'])
-        if ok:
-            username = bc.getUserName(info)
-            resp = make_response(redirect('/square'))
-            resp.set_cookie('username', username, max_age=3600)
-            resp.set_cookie('userID', info, max_age=3600)
-            return resp
-    return render_template("login.html", error=info)
+    try:
+        info = None
+        if request.method == 'POST':
+            ok, info = bc.login(request.form['email'], request.form['password'])
+            if ok:
+                username = bc.getUserName(info)
+                resp = make_response(redirect('/square'))
+                resp.set_cookie('username', username, max_age=3600)
+                resp.set_cookie('userID', info, max_age=3600)
+                return resp
+        return render_template("login.html", error=info)
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 @app.route("/register", methods=['POST', 'GET'])
 def register():
-    info = None
-    if request.method == 'POST':
-        pwd = request.form['password']
-        if pwd != request.form['rpassword']:
-            ok = False
-            info = '密码不一致'
-        else:
-            ok, info = bc.register(request.form['email'], request.form['username'], pwd, request.form['img_idx'])
-        if ok:
-            resp = make_response(redirect('/square'))
-            resp.set_cookie('username', request.form['username'], max_age=3600)
-            resp.set_cookie('userID', info, max_age=3600)
-            return resp
-    return render_template("register.html", error=info)
+    try:
+        info = None
+        if request.method == 'POST':
+            pwd = request.form['password']
+            if pwd != request.form['rpassword']:
+                ok = False
+                info = '密码不一致'
+            else:
+                ok, info = bc.register(request.form['email'], request.form['username'], pwd, request.form['img_idx'])
+            if ok:
+                resp = make_response(redirect('/square'))
+                resp.set_cookie('username', request.form['username'], max_age=3600)
+                resp.set_cookie('userID', info, max_age=3600)
+                return resp
+        return render_template("register.html", error=info)
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route("/profile", methods=['POST', 'GET'])
@@ -191,11 +199,11 @@ def recommends():
 
 @app.route('/adsearch', methods=['GET', 'POST'])
 def adsearch():
-    if request.method == 'POST' and 'searching' in request.form:
-        searching = request.form['searching']
-        return redirect('/searchresult/%s' % urllib.parse.quote(searching))
-    error = None
     try:
+        if request.method == 'POST' and 'searching' in request.form:
+            searching = request.form['searching']
+            return redirect('/searchresult/%s' % urllib.parse.quote(searching))
+        error = None
         userID = int(request.cookies["userID"])
         username = request.cookies["username"]
         if request.method == 'POST':
@@ -223,87 +231,123 @@ def adsearch():
 
 @app.route('/follow', methods=['POST'])
 def follow():
-    follow_id = request.form['follow']
-    uid = request.cookies["userID"]
-    follow_id = str(follow_id)
-    if not bc.is_following(uid, follow_id):
-        bc.follow(uid, follow_id)
-    return redirect(request.form['path'])
+    try:
+        follow_id = request.form['follow']
+        uid = request.cookies["userID"]
+        follow_id = str(follow_id)
+        if not bc.is_following(uid, follow_id):
+            bc.follow(uid, follow_id)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/unfollow', methods=['POST'])
 def unfollow():
-    unfollow_id = request.form['unfollow']
-    uid = request.cookies["userID"]
-    unfollow_id = str(unfollow_id)
-    if bc.is_following(uid, unfollow_id):
-        bc.unfollow(uid, unfollow_id)
-    return redirect(request.form['path'])
+    try:
+        unfollow_id = request.form['unfollow']
+        uid = request.cookies["userID"]
+        unfollow_id = str(unfollow_id)
+        if bc.is_following(uid, unfollow_id):
+            bc.unfollow(uid, unfollow_id)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/delete_post', methods=['POST'])
 def delete_post():
-    wid = request.form['postID']
-    wid = str(wid)
-    if bc.weibo_exists(wid):
-        bc.delete_weibo(wid)
-    return redirect(request.form['path'])
+    try:
+        wid = request.form['postID']
+        wid = str(wid)
+        if bc.weibo_exists(wid):
+            bc.delete_weibo(wid)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/add_post', methods=['POST'])
 def add_post():
-    text = request.form['content']
-    topic, text = bc.genTopicText(text)
-    uid = request.cookies["userID"]
-    _ = bc.send_weibo(uid, text, topic)
-    return redirect(request.form['path'])
+    try:
+        text = request.form['content']
+        topic, text = bc.genTopicText(text)
+        uid = request.cookies["userID"]
+        _ = bc.send_weibo(uid, text, topic)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/add_praise', methods=['POST'])
 def add_praise():
-    wid = request.form['postID']
-    uid = request.cookies["userID"]
-    wid = str(wid)
-    if not bc.is_liked_by(wid, uid):
-        bc.like_it(wid, uid)
-    return redirect(request.form['path'])
+    try:
+        wid = request.form['postID']
+        uid = request.cookies["userID"]
+        wid = str(wid)
+        if not bc.is_liked_by(wid, uid):
+            bc.like_it(wid, uid)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/delete_praise', methods=['POST'])
 def delete_praise():
-    wid = request.form['postID']
-    uid = request.cookies["userID"]
-    wid = str(wid)
-    if bc.is_liked_by(wid, uid):
-        bc.cancel_like_it(wid, uid)
-    return redirect(request.form['path'])
+    try:
+        wid = request.form['postID']
+        uid = request.cookies["userID"]
+        wid = str(wid)
+        if bc.is_liked_by(wid, uid):
+            bc.cancel_like_it(wid, uid)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/forward_post', methods=['POST'])
 def forward_post():
-    text = request.form['forward_text']
-    topic, text = bc.genTopicText(text)
-    uid = request.cookies["userID"]
-    wid1 = bc.send_weibo(uid, text, topic)
-    wid2 = request.form['postid']
-    bc.repost_weibo(wid1, wid2)
-    return redirect(request.form['path'])
+    try:
+        text = request.form['forward_text']
+        topic, text = bc.genTopicText(text)
+        uid = request.cookies["userID"]
+        wid1 = bc.send_weibo(uid, text, topic)
+        wid2 = request.form['postid']
+        bc.repost_weibo(wid1, wid2)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/add_reply', methods=['POST'])
 def add_reply():
-    wid = str(request.form['postid'])
-    uid = request.cookies["userID"]
-    text = request.form['reply_text']
-    _ = bc.send_reply(wid, uid, text)
-    return redirect(request.form['path'])
+    try:
+        wid = str(request.form['postid'])
+        uid = request.cookies["userID"]
+        text = request.form['reply_text']
+        _ = bc.send_reply(wid, uid, text)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 @app.route('/delete_reply', methods=['POST'])
 def delete_reply():
-    cid = str(request.form['replyID'])
-    bc.delete_reply(cid)
-    return redirect(request.form['path'])
+    try:
+        cid = str(request.form['replyID'])
+        bc.delete_reply(cid)
+        return redirect(request.form['path'])
+    except KeyError:
+        print(KeyError, " keyerror for username")
+        return redirect('/')
 
 
 
